@@ -1,15 +1,17 @@
 import { useContext } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthContext } from "../contexts/auth.context";
-import { ActivityPage } from "../pages/activity.page";
+import { BudgetPage } from "../pages/budget.page";
 import { DashboardPage } from "../pages/dashboard.page";
 import { HomePage } from "../pages/home.page";
+import { InsightsPage } from "../pages/insights.page";
 import { LoginPage } from "../pages/login.page";
-import { OverviewPage } from "../pages/overview.page";
 import { SignupPage } from "../pages/signup.page";
+import { TransactionsPage } from "../pages/transactions.page";
 
 export const App = () => {
-  const { isAuthenticated, hasData } = useContext(AuthContext);
+  const { isAuthenticated } = useContext(AuthContext);
+
   return (
     <>
       {!isAuthenticated ? (
@@ -19,17 +21,13 @@ export const App = () => {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
-      ) : hasData ? (
-        <Routes>
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/overview" element={<OverviewPage />} />
-          <Route path="/activity" element={<ActivityPage />} />
-          <Route path="*" element={<Navigate to="/dashboard" />} />
-        </Routes>
       ) : (
         <Routes>
-          <Route path="/activity" element={<ActivityPage />} />
-          <Route path="*" element={<Navigate to="/activity" />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/transactions" element={<TransactionsPage />} />
+          <Route path="/budget" element={<BudgetPage />} />
+          <Route path="/insights" element={<InsightsPage />} />
+          <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
       )}
     </>

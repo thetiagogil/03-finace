@@ -16,8 +16,6 @@ export const DataCard = ({ children, onClick, bgcolor, width, height, sx }: Data
     bgcolor: bgcolor,
     width: width,
     height: height,
-    m: 1,
-    border: "none",
     cursor: onClick ? "pointer" : "default",
     transition: "0.3s",
     "&:hover": {

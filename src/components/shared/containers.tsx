@@ -1,11 +1,21 @@
+import { Box } from "@mui/joy";
 import { ReactNode } from "react";
-import { MAIN_WIDTH, NAVBAR_HEIGHT } from "../../utils/constants";
+import { MAIN_BGCOLOR, MAIN_WIDTH } from "../../utils/constants";
 import { Navbar } from "../navigation/navbar";
-import { SidebarDesktop } from "../navigation/sidebar-desktop";
 import { Flex } from "../shared/flex";
 
 type Props = {
   children?: ReactNode;
+};
+
+type ContentProps = {
+  position: "left" | "right";
+  children?: ReactNode;
+};
+
+type AuthPageContainerProps = {
+  leftChildren?: ReactNode;
+  rightChildren?: ReactNode;
 };
 
 export const HomePageContainer = ({ children }: Props) => {
@@ -24,24 +34,38 @@ export const FormPageContainer = ({ children }: Props) => {
   );
 };
 
-export const AuthPageContainer = ({ children }: Props) => {
+export const Content = ({ position, children }: ContentProps) => {
   return (
-    <Flex y fullwidth fullheight sx={{ bgcolor: "neutral.100", minHeight: "100vh", overflow: "hidden" }}>
+    <Box
+      component={"section"}
+      sx={{
+        width: position === "left" ? { xs: "100%", md: "80%" } : { xs: "100%", md: "20%" },
+        py: 4,
+        pl: position === "left" ? { xs: 2, lg: 0 } : 2,
+        pr: position === "left" ? 2 : { xs: 2, lg: 0 },
+        order: { xs: position === "left" ? 2 : 1, md: 0 }
+        /* overflowY: { xs: "none", lg: "auto" } */
+      }}
+    >
+      {children}
+    </Box>
+  );
+};
+
+export const AuthPageContainer = ({ leftChildren, rightChildren }: AuthPageContainerProps) => {
+  return (
+    <Flex y fullwidth fullheight sx={{ bgcolor: MAIN_BGCOLOR, height: "100vh" }}>
       <Navbar />
-      <Flex x fullwidth sx={{ height: `calc(100vh - ${NAVBAR_HEIGHT}px)`, overflowX: "hidden" }}>
-        <SidebarDesktop />
-        <Flex
-          x
-          xc
-          component="main"
-          sx={{
-            flex: 1,
-            overflowY: "auto",
-            height: "100%"
-          }}
-        >
-          <Flex y sx={{ height: "100%", width: { xs: "100%", lg: MAIN_WIDTH }, p: 1 }}>
-            {children}
+      <Flex component="main" x fullwidth sx={{ overflowX: "hidden" }}>
+        <Flex x xc fullwidth>
+          <Flex
+            sx={{
+              width: { xs: "100%", lg: MAIN_WIDTH },
+              flexDirection: { xs: "column", md: "row" }
+            }}
+          >
+            <Content position="left">{leftChildren}</Content>
+            <Content position="right">{rightChildren}</Content>
           </Flex>
         </Flex>
       </Flex>

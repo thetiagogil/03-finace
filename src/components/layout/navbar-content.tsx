@@ -1,23 +1,25 @@
 import { Grid, Stack, Typography } from "@mui/joy";
-import { SIDEBAR_WIDTH } from "../../utils/constants";
-import { SidebarMobile } from "../navigation/sidebar-mobile";
+import { MAIN_WIDTH } from "../../utils/constants";
+import { NavbarMobile } from "../navigation/navbar-mobile";
 import { Flex } from "../shared/flex";
 import { NavbarDropdown } from "./navbar-dropdown";
+import { NavbarList } from "./navbar-list";
 
 export const NavbarContent = () => {
   return (
-    <Grid container sx={{ width: "100%" }}>
-      <Grid xs={4} sx={{ pl: 1, display: { xs: "block", lg: "none" } }}>
-        <SidebarMobile />
+    <Grid container sx={{ width: { xs: "100%", lg: MAIN_WIDTH } }}>
+      <Grid xs={4} sx={{ display: { xs: "block", md: "none" }, pl: 2 }}>
+        <NavbarMobile />
       </Grid>
-      <Grid xs={4} lg={6}>
-        <Flex x xc yc fullheight sx={{ width: { xs: "100%", lg: SIDEBAR_WIDTH } }}>
-          <Typography level="title-md" sx={{ color: "neutral.50" }}>
-            FIN/ACE
-          </Typography>
+      <Grid xs={4} md={2} sx={{ pl: { xs: 2, lg: 0 } }}>
+        <Flex x yc fullheight sx={{ justifyContent: { xs: "center", md: "start" } }}>
+          <Typography level="title-md">FIN/ACE</Typography>
         </Flex>
       </Grid>
-      <Stack component={Grid} xs={4} lg={6} sx={{ pr: 1, alignItems: "end" }}>
+      <Grid md={8} sx={{ display: { xs: "none", md: "block" } }}>
+        <NavbarList />
+      </Grid>
+      <Stack component={Grid} xs={4} md={2} sx={{ alignItems: "end", pr: { xs: 2, lg: 0 } }}>
         <NavbarDropdown />
       </Stack>
     </Grid>

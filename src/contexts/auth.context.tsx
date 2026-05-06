@@ -1,15 +1,12 @@
 import { jwtDecode } from "jwt-decode";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useHasTx } from "../api/tx-api";
 import { DataService } from "../services/data-service";
 
 type AuthContextProps = {
   isAuthenticated: boolean;
   userId: string;
   token: string | null;
-  hasData: boolean;
-  loadingData: boolean;
   handleSignup: (payload: SignupPayloadProps) => Promise<void>;
   handleLogin: (payload: LoginPayloadProps) => Promise<void>;
   handleLogout: () => Promise<void>;
@@ -43,7 +40,6 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userId, setUserId] = useState<string>("");
   const [token, setToken] = useState<string | null>(null);
-  const { hasData, loading: loadingData } = useHasTx(userId);
 
   useEffect(() => {
     const storedToken = window.localStorage.getItem("authToken");
@@ -113,8 +109,6 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         isAuthenticated,
         userId,
         token,
-        hasData,
-        loadingData,
         handleSignup,
         handleLogin,
         handleLogout

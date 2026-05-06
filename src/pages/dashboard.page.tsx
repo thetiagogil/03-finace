@@ -1,70 +1,77 @@
-import { useContext, useState } from "react";
-import { useGetUser } from "../api/users-api";
-import {
-  useGetMonths,
-  useGetYearCategorySummary,
-  useGetYears,
-  useGetYearTopTrackedCategories,
-  useGetYearTotals
-} from "../api/years-api";
-import { DashboardCharts } from "../components/layout/dashboard-charts";
-import { DashboardFilters } from "../components/layout/dashboard-filters";
-import { DashboardGraph } from "../components/layout/dashboard-graph";
-import { DashboardTables } from "../components/layout/dashboard-tables";
+import { Button, Card, Divider, Typography } from "@mui/joy";
+import { ComponentTitle } from "../components/shared/component-title";
 import { AuthPageContainer } from "../components/shared/containers";
 import { Flex } from "../components/shared/flex";
-import { Loading } from "../components/shared/loading";
-import { AuthContext } from "../contexts/auth.context";
 
 export const DashboardPage = () => {
-  const { userId } = useContext(AuthContext);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const { data: years } = useGetYears({ userId });
-  const { data: monthsWithValue } = useGetMonths({ userId, year: selectedYear });
-  const { data: userData, loading: userLoading } = useGetUser({ userId });
-  const { data: tableData, loading: tableLoading } = useGetYearCategorySummary({
-    userId,
-    year: selectedYear,
-    month: selectedMonth
-  });
-  const { data: graphData, loading: graphLoading } = useGetYearTotals({
-    userId,
-    year: selectedYear
-  });
-  const { data: chartData, loading: chartLoading } = useGetYearTopTrackedCategories({
-    userId,
-    year: selectedYear,
-    month: selectedMonth
-  });
-  const isLoading = userLoading || tableLoading || graphLoading || chartLoading;
-  const isMonthDisabled = (shortMonth: string) => {
-    return !monthsWithValue?.includes(shortMonth);
-  };
   return (
-    <AuthPageContainer>
-      {isLoading ? (
-        <Loading size="md" />
-      ) : (
-        <>
-          <Flex fullwidth>
-            <DashboardFilters
-              userData={userData}
-              years={years}
-              selectedYear={selectedYear}
-              setSelectedYear={setSelectedYear}
-              selectedMonth={selectedMonth}
-              setSelectedMonth={setSelectedMonth}
-              isMonthDisabled={isMonthDisabled}
-            />
-          </Flex>
-          <Flex fullwidth sx={{ flexDirection: { xs: "column-reverse", md: "row" } }}>
-            <DashboardGraph graphData={graphData} selectedMonth={selectedMonth} />
-            <DashboardCharts data={chartData} />
-          </Flex>
-          <DashboardTables data={tableData} />
-        </>
-      )}
-    </AuthPageContainer>
+    <AuthPageContainer
+      leftChildren={
+        <Flex y gap={4} fullwidth>
+          <ComponentTitle title="Dashboard" />
+          {/* Monthly Summary */}
+          <Card variant="outlined" sx={{ p: 3, borderRadius: "md" }}>
+            <Typography level="h4" mb={2}>
+              Monthly Summary
+            </Typography>
+            <Flex x xs yc gap={4}>
+              <Flex y sx={{ flex: 1 }}>
+                <Typography level="body-sm">Total Income</Typography>
+                <Typography level="body-lg" color="success">
+                  $4,200
+                </Typography>
+              </Flex>
+              <Divider orientation="vertical" />
+              <Flex y sx={{ flex: 1 }}>
+                <Typography level="body-sm">Total Expenses</Typography>
+                <Typography level="body-lg" color="danger">
+                  $3,200
+                </Typography>
+              </Flex>
+              <Divider orientation="vertical" />
+              <Flex y sx={{ flex: 1 }}>
+                <Typography level="body-sm">Total Savings</Typography>
+                <Typography level="body-lg" color="primary">
+                  $1,000
+                </Typography>
+              </Flex>
+            </Flex>
+          </Card>
+
+          {/* Quick Actions */}
+          <Card variant="outlined" sx={{ p: 3, borderRadius: "md" }}>
+            <Typography level="h4" mb={2}>
+              Quick Actions
+            </Typography>
+            <Flex x gap={2}>
+              <Button variant="outlined" color="primary">
+                Add Income
+              </Button>
+              <Button variant="outlined" color="danger">
+                Add Expense
+              </Button>
+              <Button variant="outlined" color="neutral">
+                Set Budget
+              </Button>
+            </Flex>
+          </Card>
+
+          {/* Recent Transaction Feed */}
+          <Card variant="outlined" sx={{ p: 3, borderRadius: "md" }}>
+            <Typography level="h4" mb={2}>
+              Recent Transaction
+            </Typography>
+            {/* Here you can add a component to render a list of recent transactions with filters */}
+            <Flex y gap={1}>
+              <Typography>Transaction 1 - $100 (Groceries)</Typography>
+              <Typography>Transaction 2 - $200 (Salary)</Typography>
+              <Typography>Transaction 3 - $50 (Transport)</Typography>
+              {/* Add more items as needed */}
+            </Flex>
+          </Card>
+        </Flex>
+      }
+      rightChildren={<></>}
+    />
   );
 };

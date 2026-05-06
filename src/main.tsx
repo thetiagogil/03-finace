@@ -4,6 +4,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { AuthContextProvider } from "./contexts/auth.context";
+import { InfoContextProvider } from "./contexts/info.context.js";
 import "./main.css";
 import { App } from "./router/app.jsx";
 import { theme } from "./utils/theme";
@@ -14,7 +15,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <CssBaseline />
       <BrowserRouter>
         <AuthContextProvider>
-          <App />
+          <InfoContextProvider>
+            <App />
+          </InfoContextProvider>
         </AuthContextProvider>
       </BrowserRouter>
     </CssVarsProvider>

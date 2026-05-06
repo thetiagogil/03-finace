@@ -41,6 +41,7 @@ export const EditWalletCurrencyModal = ({ open, onClose, userId, walletValue }: 
             placeholder={walletValue}
             value={value || walletValue}
             onChange={(_e, newValue) => setValue(newValue as string)}
+            sx={{ width: "100%" }}
           >
             {currencies.map(currency => (
               <Option key={currency.code} value={currency.code}>

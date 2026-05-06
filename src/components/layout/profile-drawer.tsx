@@ -57,8 +57,8 @@ export const ProfileDrawer = ({ open, onClose }: ProfileDrawerProps) => {
   };
 
   const wallet: WalletItem[] = [
-    { type: "initial", value: initialBalance, label: "Initial balance" },
-    { type: "current", value: currentBalance, label: "Current balance" },
+    { type: "initial", value: `${currencySymbol}${initialBalance}`, label: "Initial balance" },
+    { type: "current", value: `${currencySymbol}${currentBalance}`, label: "Current balance" },
     { type: "currency", value: `${currencyCode} (${currencySymbol})`, label: "Currency" }
   ];
 

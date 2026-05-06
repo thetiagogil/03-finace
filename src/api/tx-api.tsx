@@ -8,17 +8,17 @@ type UseGetTxByStatusProps = {
 };
 
 export const useHasTx = (userId: string) => {
-  const [hasData, setHasData] = useState(true);
+  const [data, setData] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const hasTx = async () => {
     setLoading(true);
     try {
       const response = await DataService.getData(`/api/tx/has-data/${userId}`);
-      setHasData(response);
+      setData(response);
     } catch (error) {
       console.error(error);
-      setHasData(false);
+      setData(false);
     } finally {
       setLoading(false);
     }
@@ -30,7 +30,7 @@ export const useHasTx = (userId: string) => {
     }
   }, [userId]);
 
-  return { hasData, loading };
+  return { data, loading };
 };
 
 export const useCreateTx = () => {

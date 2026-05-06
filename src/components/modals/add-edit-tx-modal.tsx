@@ -6,7 +6,7 @@ import { capFirstLetter } from "../../utils/typo";
 import { txCategoriesArray, txTypesArray } from "../arrays/tx-array";
 import { Flex } from "../shared/flex";
 
-type AddTxModalProps = {
+type AddEditTxModalProps = {
   open: boolean;
   onClose: () => void;
   userId: string;
@@ -17,7 +17,7 @@ type AddTxModalProps = {
   deleting?: boolean;
 };
 
-export const AddTxModal = ({
+export const AddEditTxModal = ({
   open,
   onClose,
   userId,
@@ -26,7 +26,7 @@ export const AddTxModal = ({
   initialData,
   handleDelete,
   deleting
-}: AddTxModalProps) => {
+}: AddEditTxModalProps) => {
   const [formData, setFormData] = useState({
     type: "",
     category: "",
@@ -78,7 +78,7 @@ export const AddTxModal = ({
       <ModalDialog sx={{ width: 500 }}>
         <ModalClose />
         <Flex x>
-          <Typography>{editMode ? "Edit Activity" : "Create an Activity"}</Typography>
+          <Typography>{editMode ? "Edit Transaction" : "Create Transaction"}</Typography>
         </Flex>
         <Flex y gap={2} fullwidth>
           <Flex gap={2}>
@@ -155,7 +155,7 @@ export const AddTxModal = ({
             </Button>
           )}
           <Button onClick={handleSubmit} loading={creating || editing} disabled={!isFormValid}>
-            {editMode ? "Edit activity" : "Add activity"}
+            {editMode ? "Edit Transaction" : "Add Transaction"}
           </Button>
         </Flex>
       </ModalDialog>
