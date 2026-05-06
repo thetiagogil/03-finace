@@ -1,7 +1,8 @@
 {
-  "name": "project",
+  "name": "finace",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "A local-first personal finance tracker for comparing planned and tracked income and expenses.",
   "type": "module",
   "scripts": {
     "dev": "vite",
