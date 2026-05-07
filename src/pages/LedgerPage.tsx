@@ -11,7 +11,7 @@ export const LedgerPage = () => {
   const records = useRecords();
   const years = getYearOptions(records);
   const [year, setYear] = useState(new Date().getFullYear());
-  const [mode, setMode] = useState<ModeFilter>("both");
+  const [mode, setMode] = useState<ModeFilter>("tracked");
   const yearRecords = useMemo(() => records.filter(record => record.date.startsWith(String(year))), [records, year]);
   const emptyTitle = records.length === 0 ? "No ledger data yet" : `No records in ${year}`;
   const emptyDescription = records.length === 0
@@ -37,9 +37,9 @@ export const LedgerPage = () => {
             <FormControl size="small" sx={{ minWidth: 190 }}>
               <InputLabel>Mode</InputLabel>
               <Select label="Mode" value={mode} onChange={event => setMode(event.target.value as ModeFilter)}>
-                <MenuItem value="both">Planned & Tracked</MenuItem>
-                <MenuItem value="planned">Planned only</MenuItem>
                 <MenuItem value="tracked">Tracked only</MenuItem>
+                <MenuItem value="planned">Planned only</MenuItem>
+                <MenuItem value="both">Tracked & Planned</MenuItem>
               </Select>
             </FormControl>
           </Stack>

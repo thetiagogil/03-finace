@@ -12,7 +12,7 @@ interface RecordDialogProps {
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-export const RecordDialog = ({ trigger, defaultKind = "expense", defaultMode = "tracked", initialRecord }: RecordDialogProps) => {
+export const RecordDialog = ({ trigger, defaultKind = "income", defaultMode = "tracked", initialRecord }: RecordDialogProps) => {
   const [open, setOpen] = useState(false);
   const [kind, setKind] = useState<RecordKind>(defaultKind);
   const [mode, setMode] = useState<RecordMode>(defaultMode);
@@ -85,8 +85,8 @@ export const RecordDialog = ({ trigger, defaultKind = "expense", defaultMode = "
               <Stack spacing={1} flex={1}>
                 <Typography variant="body2" fontWeight={600}>Mode</Typography>
                 <ToggleButtonGroup exclusive fullWidth value={mode} onChange={(_, value: RecordMode | null) => value && setMode(value)}>
-                  <ToggleButton value="planned">Planned</ToggleButton>
                   <ToggleButton value="tracked">Tracked</ToggleButton>
+                  <ToggleButton value="planned">Planned</ToggleButton>
                 </ToggleButtonGroup>
               </Stack>
             </Stack>

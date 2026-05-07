@@ -1,6 +1,6 @@
 export type RecordKind = "income" | "expense";
 
-export type RecordMode = "planned" | "tracked";
+export type RecordMode = "tracked" | "planned";
 
 export type ModeFilter = "both" | RecordMode;
 

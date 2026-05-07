@@ -144,7 +144,7 @@ export const DashboardPage = () => {
                       Net by month
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Planned vs. tracked, last 6 months
+                      Tracked vs. planned, last 6 months
                     </Typography>
                   </Box>
                   <Button
@@ -173,15 +173,15 @@ export const DashboardPage = () => {
                       <Tooltip formatter={formatChartValue} />
                       <Legend wrapperStyle={{ fontSize: 12 }} />
                       <Bar
-                        dataKey="planned"
-                        fill="#5a75bd"
-                        name="Planned"
-                        radius={[4, 4, 0, 0]}
-                      />
-                      <Bar
                         dataKey="tracked"
                         fill="#243d73"
                         name="Tracked"
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <Bar
+                        dataKey="planned"
+                        fill="#5a75bd"
+                        name="Planned"
                         radius={[4, 4, 0, 0]}
                       />
                     </BarChart>

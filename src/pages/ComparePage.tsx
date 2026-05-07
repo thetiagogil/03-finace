@@ -14,7 +14,7 @@ export const ComparePage = () => {
   const years = getYearOptions(records);
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(allMonths);
-  const [kind, setKind] = useState<RecordKind>("expense");
+  const [kind, setKind] = useState<RecordKind>("income");
 
   const rows = useMemo(() => {
     return getCompareRows(records, kind, year, month);
@@ -41,15 +41,15 @@ export const ComparePage = () => {
             <FormControl size="small" sx={{ minWidth: 140 }}>
               <InputLabel>Kind</InputLabel>
               <Select label="Kind" value={kind} onChange={event => setKind(event.target.value as RecordKind)}>
-                <MenuItem value="expense">Expenses</MenuItem>
                 <MenuItem value="income">Income</MenuItem>
+                <MenuItem value="expense">Expenses</MenuItem>
               </Select>
             </FormControl>
           </Stack>
         </Stack>
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, gap: 2 }}>
-          <Stat label="Planned total" value={formatCurrency(totals.planned)} />
           <Stat label="Tracked total" value={formatCurrency(totals.tracked)} />
+          <Stat label="Planned total" value={formatCurrency(totals.planned)} />
           <Stat label={kind === "expense" ? "Over budget categories" : "Under target categories"} value={String(riskCount)} color="error.main" />
         </Box>
         <Card variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
@@ -65,8 +65,8 @@ export const ComparePage = () => {
                   <YAxis dataKey="category" type="category" stroke="#69758a" fontSize={12} width={110} />
                   <Tooltip formatter={formatChartValue} />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="planned" fill="#5a75bd" name="Planned" radius={[0, 4, 4, 0]} />
                   <Bar dataKey="tracked" fill={kind === "expense" ? "#c44a36" : "#2f9d68"} name="Tracked" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="planned" fill="#5a75bd" name="Planned" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Box>
@@ -74,7 +74,7 @@ export const ComparePage = () => {
         </Card>
         <Card variant="outlined" sx={{ borderRadius: 3, overflow: "hidden" }}>
           <Table>
-            <TableHead><TableRow><TableCell>Category</TableCell><TableCell align="right">Planned</TableCell><TableCell align="right">Tracked</TableCell><TableCell align="right">Diff</TableCell><TableCell align="right">% of plan</TableCell></TableRow></TableHead>
+            <TableHead><TableRow><TableCell>Category</TableCell><TableCell align="right">Tracked</TableCell><TableCell align="right">Planned</TableCell><TableCell align="right">Diff</TableCell><TableCell align="right">% of plan</TableCell></TableRow></TableHead>
             <TableBody>
               {rows.length === 0 ? (
                 <TableRow>
@@ -87,8 +87,8 @@ export const ComparePage = () => {
                 return (
                   <TableRow key={row.category}>
                     <TableCell sx={{ fontWeight: 700 }}>{row.category}</TableCell>
-                    <TableCell align="right">{formatCurrency(row.planned)}</TableCell>
                     <TableCell align="right">{formatCurrency(row.tracked)}</TableCell>
+                    <TableCell align="right">{formatCurrency(row.planned)}</TableCell>
                     <TableCell align="right" sx={{ color: bad ? "error.main" : "success.main", fontWeight: 700 }}>{row.diff >= 0 ? "+" : ""}{formatCurrency(row.diff)}</TableCell>
                     <TableCell align="right" sx={{ color: "text.secondary" }}>{row.percent === null ? "-" : `${Math.round(row.percent)}%`}</TableCell>
                   </TableRow>

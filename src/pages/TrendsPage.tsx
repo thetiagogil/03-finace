@@ -25,7 +25,7 @@ export const TrendsPage = () => {
           <EmptyState title="No trends yet" description="Add records across one or more months to see income, expense, and net movement over time." />
         ) : (
           <>
-            <ChartCard title="Net worth flow" subtitle="Planned vs tracked net per month">
+            <ChartCard title="Net worth flow" subtitle="Tracked vs planned net per month">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={monthly}>
                   <defs>
@@ -37,8 +37,8 @@ export const TrendsPage = () => {
                   <YAxis stroke="#69758a" fontSize={12} tickFormatter={formatCurrencyAxis} />
                   <Tooltip formatter={formatChartValue} />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Area type="monotone" dataKey="netPlanned" stroke="#5a75bd" fill="url(#netPlanned)" strokeDasharray="4 4" name="Planned net" />
                   <Area type="monotone" dataKey="netTracked" stroke="#243d73" fill="url(#netTracked)" strokeWidth={2} name="Tracked net" />
+                  <Area type="monotone" dataKey="netPlanned" stroke="#5a75bd" fill="url(#netPlanned)" strokeDasharray="4 4" name="Planned net" />
                 </AreaChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -62,7 +62,7 @@ const ChartCard = ({ title, subtitle, children }: { title: string; subtitle: str
 );
 
 const TrendLine = ({ title, plannedKey, trackedKey, trackedColor, data }: { title: string; plannedKey: string; trackedKey: string; trackedColor: string; data: object[] }) => (
-  <ChartCard title={title} subtitle="Planned vs tracked">
+  <ChartCard title={title} subtitle="Tracked vs planned">
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="#e2e7ef" vertical={false} />
@@ -70,8 +70,8 @@ const TrendLine = ({ title, plannedKey, trackedKey, trackedColor, data }: { titl
         <YAxis stroke="#69758a" fontSize={12} tickFormatter={formatCurrencyAxis} />
         <Tooltip formatter={formatChartValue} />
         <Legend wrapperStyle={{ fontSize: 12 }} />
-        <Line type="monotone" dataKey={plannedKey} stroke="#5a75bd" strokeDasharray="4 4" name="Planned" dot={false} />
         <Line type="monotone" dataKey={trackedKey} stroke={trackedColor} strokeWidth={2} name="Tracked" dot={{ r: 3 }} />
+        <Line type="monotone" dataKey={plannedKey} stroke="#5a75bd" strokeDasharray="4 4" name="Planned" dot={false} />
       </LineChart>
     </ResponsiveContainer>
   </ChartCard>

@@ -109,7 +109,7 @@ export const getCategoryUsage = (records: FinanceRecord[], kind: RecordKind) => 
   return map;
 };
 
-export const shownModes = (mode: ModeFilter): RecordMode[] => (mode === "both" ? ["planned", "tracked"] : [mode]);
+export const shownModes = (mode: ModeFilter): RecordMode[] => (mode === "both" ? ["tracked", "planned"] : [mode]);
 
 export const emptyMonthTotals = () => Array.from({ length: 12 }, () => ({ planned: 0, tracked: 0 }));
 
