@@ -41,8 +41,8 @@ export const RecordsPage = () => {
             <Typography variant="caption" sx={{ color: "text.secondary", textTransform: "uppercase", letterSpacing: "0.2em" }}>
               Records - {getPeriodLabel(year, month)}
             </Typography>
-            <Typography variant="h3">All movements</Typography>
-            <Typography color="text.secondary" sx={{ mt: 1 }}>Every line of your financial story.</Typography>
+            <Typography variant="h3">Records</Typography>
+            <Typography color="text.secondary" sx={{ mt: 1 }}>Create, filter, edit, and review every planned or tracked movement.</Typography>
           </Box>
           <RecordDialog trigger={<Button variant="contained" startIcon={<AddIcon />}>New record</Button>} />
         </Stack>

@@ -24,8 +24,8 @@ export const LedgerPage = () => {
         <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" alignItems={{ md: "flex-end" }} spacing={3}>
           <Box>
             <Typography variant="caption" sx={{ color: "text.secondary", textTransform: "uppercase", letterSpacing: "0.2em" }}>Ledger - {year}</Typography>
-            <Typography variant="h3">Yearly overview</Typography>
-            <Typography color="text.secondary" sx={{ mt: 1 }}>Categories on rows, months on columns. Income first, expenses below.</Typography>
+            <Typography variant="h3">Ledger</Typography>
+            <Typography color="text.secondary" sx={{ mt: 1 }}>Review income, expenses, and net totals by category across the year.</Typography>
           </Box>
           <Stack direction="row" spacing={1.5}>
             <FormControl size="small" sx={{ minWidth: 130 }}>

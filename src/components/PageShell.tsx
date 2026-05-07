@@ -1,12 +1,12 @@
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import BookOutlinedIcon from "@mui/icons-material/BookOutlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import CompareArrowsOutlinedIcon from "@mui/icons-material/CompareArrowsOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import ShowChartOutlinedIcon from "@mui/icons-material/ShowChartOutlined";
-import PlaylistAddOutlinedIcon from "@mui/icons-material/PlaylistAddOutlined";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import TableChartOutlinedIcon from "@mui/icons-material/TableChartOutlined";
 import { AppBar, Avatar, Box, Button, Container, Divider, Drawer, IconButton, Menu, MenuItem, Stack, Toolbar, Typography } from "@mui/material";
 import type { SvgIconComponent } from "@mui/icons-material";
 import { useState, type ReactNode } from "react";
@@ -25,9 +25,9 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { path: "/dashboard", label: "Overview", icon: DashboardOutlinedIcon },
-  { path: "/records", label: "Records", icon: PlaylistAddOutlinedIcon },
-  { path: "/ledger", label: "Ledger", icon: BookOutlinedIcon },
+  { path: "/dashboard", label: "Dashboard", icon: DashboardOutlinedIcon },
+  { path: "/records", label: "Records", icon: ReceiptLongOutlinedIcon },
+  { path: "/ledger", label: "Ledger", icon: TableChartOutlinedIcon },
   { path: "/compare", label: "Compare", icon: CompareArrowsOutlinedIcon },
   { path: "/trends", label: "Trends", icon: ShowChartOutlinedIcon },
   { path: "/categories", label: "Categories", icon: CategoryOutlinedIcon }
