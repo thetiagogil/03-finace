@@ -4,14 +4,16 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import { Box, Button, Card, Chip, Container, FormControl, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, Table, TableBody, TableCell, TableFooter, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { useMemo, useState } from "react";
+import { ConfirmAction } from "../components/ConfirmAction";
 import { PeriodFilter } from "../components/PeriodFilter";
 import { RecordDialog } from "../components/RecordDialog";
 import type { ModeFilter, RecordKind } from "../models/finance";
-import { deleteRecord, formatCurrency, useEnsureSeed, useRecords } from "../services/financeService";
-import { allMonths, getPeriodLabel, getYearOptions, periodMatches } from "../utils/period";
+import { deleteRecord, useRecords } from "../services/financeService";
+import { getFilteredRecords, getRecordTotals } from "../utils/financeCalculations";
+import { formatCurrency } from "../utils/formatters";
+import { allMonths, getPeriodLabel, getYearOptions } from "../utils/period";
 
 export const RecordsPage = () => {
-  useEnsureSeed();
   const records = useRecords();
   const years = getYearOptions(records);
   const [year, setYear] = useState(new Date().getFullYear());
@@ -21,27 +23,10 @@ export const RecordsPage = () => {
   const [search, setSearch] = useState("");
 
   const filteredRecords = useMemo(() => {
-    const inPeriod = periodMatches(year, month);
-    const query = search.trim().toLowerCase();
-    return records
-      .filter(record => inPeriod(record.date))
-      .filter(record => (mode === "both" ? true : record.mode === mode))
-      .filter(record => (kind === "all" ? true : record.kind === kind))
-      .filter(record => {
-        if (!query) return true;
-        return record.category.toLowerCase().includes(query) || (record.subcategory ?? "").toLowerCase().includes(query) || (record.description ?? "").toLowerCase().includes(query);
-      })
-      .sort((a, b) => b.date.localeCompare(a.date));
+    return getFilteredRecords(records, { year, month, mode, kind, search });
   }, [kind, mode, month, records, search, year]);
 
-  const totals = filteredRecords.reduce(
-    (result, record) => ({
-      income: result.income + (record.kind === "income" ? record.amount : 0),
-      expense: result.expense + (record.kind === "expense" ? record.amount : 0)
-    }),
-    { income: 0, expense: 0 }
-  );
-  const net = totals.income - totals.expense;
+  const totals = getRecordTotals(filteredRecords);
 
   return (
     <Container maxWidth="xl" sx={{ py: 5 }}>
@@ -60,7 +45,7 @@ export const RecordsPage = () => {
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, gap: 2 }}>
           <Summary label="Total income" value={formatCurrency(totals.income)} color="success.main" />
           <Summary label="Total expense" value={formatCurrency(totals.expense)} color="error.main" />
-          <Summary label="Net" value={formatCurrency(net)} color={net >= 0 ? "success.main" : "error.main"} />
+          <Summary label="Net" value={formatCurrency(totals.net)} color={totals.net >= 0 ? "success.main" : "error.main"} />
         </Box>
 
         <Card variant="outlined" sx={{ borderRadius: 3, overflow: "hidden" }}>
@@ -126,7 +111,9 @@ export const RecordsPage = () => {
                       <TableCell align="right">
                         <Stack direction="row" justifyContent="flex-end" spacing={0.5}>
                           <RecordDialog initialRecord={record} trigger={<IconButton size="small"><EditOutlinedIcon fontSize="small" /></IconButton>} />
-                          <IconButton size="small" color="error" onClick={() => deleteRecord(record.id)}><DeleteOutlineIcon fontSize="small" /></IconButton>
+                          <ConfirmAction title="Delete record?" description="This record will be permanently removed from your local data." confirmLabel="Delete" onConfirm={() => deleteRecord(record.id)}>
+                            <IconButton size="small" color="error"><DeleteOutlineIcon fontSize="small" /></IconButton>
+                          </ConfirmAction>
                         </Stack>
                       </TableCell>
                     </TableRow>
@@ -137,7 +124,7 @@ export const RecordsPage = () => {
                 <TableFooter>
                   <TableRow>
                     <TableCell colSpan={5} align="right">Net for period</TableCell>
-                    <TableCell align="right" sx={{ color: net >= 0 ? "success.main" : "error.main", fontWeight: 700 }}>{formatCurrency(net)}</TableCell>
+                    <TableCell align="right" sx={{ color: totals.net >= 0 ? "success.main" : "error.main", fontWeight: 700 }}>{formatCurrency(totals.net)}</TableCell>
                     <TableCell />
                   </TableRow>
                 </TableFooter>

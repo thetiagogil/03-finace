@@ -8,11 +8,11 @@ import { Link } from "react-router-dom";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { RecordDialog } from "../components/RecordDialog";
 import { StatCard } from "../components/StatCard";
-import type { FinanceRecord, RecordKind, RecordMode } from "../models/finance";
-import { formatCurrency, useEnsureSeed, useRecords } from "../services/financeService";
+import { useRecords } from "../services/financeService";
+import { getCategoryTotals, getMonthlyNetSeries, sumRecords } from "../utils/financeCalculations";
+import { formatChartValue, formatCurrency } from "../utils/formatters";
 
 export const DashboardPage = () => {
-  useEnsureSeed();
   const records = useRecords();
   const now = new Date();
   const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -25,16 +25,7 @@ export const DashboardPage = () => {
   const netPlan = incomePlan - expensePlan;
   const netTrack = incomeTrack - expenseTrack;
 
-  const monthly = Array.from({ length: 6 }, (_, index) => {
-    const date = new Date(now.getFullYear(), now.getMonth() - (5 - index), 1);
-    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    const monthItems = records.filter(record => record.date.startsWith(key));
-    return {
-      month: date.toLocaleString(undefined, { month: "short" }),
-      planned: sumRecords(monthItems, "income", "planned") - sumRecords(monthItems, "expense", "planned"),
-      tracked: sumRecords(monthItems, "income", "tracked") - sumRecords(monthItems, "expense", "tracked")
-    };
-  });
+  const monthly = getMonthlyNetSeries(records, now);
 
   const topExpenses = getCategoryTotals(monthRecords.filter(record => record.kind === "expense")).slice(0, 5);
 
@@ -124,26 +115,6 @@ export const DashboardPage = () => {
       </Stack>
     </Container>
   );
-};
-
-const sumRecords = (records: FinanceRecord[], kind: RecordKind, mode: RecordMode) => {
-  return records.filter(record => record.kind === kind && record.mode === mode).reduce((sum, record) => sum + record.amount, 0);
-};
-
-const formatChartValue = (value: unknown) => {
-  return typeof value === "number" ? formatCurrency(value) : String(value ?? "");
-};
-
-const getCategoryTotals = (records: FinanceRecord[]) => {
-  const totals = new Map<string, { planned: number; tracked: number }>();
-  records.forEach(record => {
-    const current = totals.get(record.category) ?? { planned: 0, tracked: 0 };
-    current[record.mode] += record.amount;
-    totals.set(record.category, current);
-  });
-  return Array.from(totals.entries())
-    .map(([category, values]) => ({ category, ...values }))
-    .sort((a, b) => b.tracked - a.tracked);
 };
 
 const Callout = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (

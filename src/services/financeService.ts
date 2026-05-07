@@ -1,9 +1,9 @@
-import { useEffect, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 import type { FinanceRecord, RecordKind } from "../models/finance";
+import { getCurrentUser, testUserId } from "./authService";
 
-const recordsKey = "finace.records.v1";
-const categoriesKey = "finace.categories.v1";
-const seedKey = "finace.seeded.v1";
+const recordsKeyPrefix = "finace.records";
+const categoriesKeyPrefix = "finace.categories";
 
 type Listener = () => void;
 
@@ -16,6 +16,12 @@ const defaultCategories: Record<RecordKind, string[]> = {
 };
 
 const emit = () => listeners.forEach(listener => listener());
+
+const getActiveUserId = () => getCurrentUser()?.id ?? "";
+
+const recordsKey = (userId = getActiveUserId()) => `${recordsKeyPrefix}.${userId}.v1`;
+
+const categoriesKey = (userId = getActiveUserId()) => `${categoriesKeyPrefix}.${userId}.v1`;
 
 const read = <T,>(key: string, fallback: T): T => {
   try {
@@ -54,13 +60,10 @@ const makeSeedRecord = (
   };
 };
 
-export const seedRecordsIfEmpty = () => {
-  if (localStorage.getItem(seedKey)) return;
-  const existingRecords = read<FinanceRecord[]>(recordsKey, []);
-  if (existingRecords.length > 0) {
-    localStorage.setItem(seedKey, "1");
-    return;
-  }
+export const seedTestUserRecords = () => {
+  const key = recordsKey(testUserId);
+  const existingRecords = read<FinanceRecord[]>(key, []);
+  if (existingRecords.length > 0) return;
   const records: FinanceRecord[] = [];
   for (let monthOffset = -5; monthOffset <= 0; monthOffset += 1) {
     records.push(makeSeedRecord("income", "planned", "Salary", 4200, 1, monthOffset));
@@ -78,8 +81,7 @@ export const seedRecordsIfEmpty = () => {
     records.push(makeSeedRecord("expense", "planned", "Subscriptions", 60, 3, monthOffset));
     records.push(makeSeedRecord("expense", "tracked", "Subscriptions", 72, 3, monthOffset));
   }
-  write(recordsKey, records);
-  localStorage.setItem(seedKey, "1");
+  write(key, records);
 };
 
 const subscribe = (listener: Listener) => {
@@ -96,25 +98,20 @@ export const useRecords = () => {
   return useSyncExternalStore(
     subscribe,
     () => {
-      const json = localStorage.getItem(recordsKey) ?? "[]";
-      const cached = cache.get(json);
+      const key = recordsKey();
+      const json = localStorage.getItem(key) ?? "[]";
+      const cacheKey = `${key}:${json}`;
+      const cached = cache.get(cacheKey);
       if (cached) return cached;
       const parsed = JSON.parse(json) as FinanceRecord[];
-      cache.set(json, parsed);
+      cache.set(cacheKey, parsed);
       return parsed;
     },
     () => []
   );
 };
 
-export const useEnsureSeed = () => {
-  useEffect(() => {
-    seedRecordsIfEmpty();
-    emit();
-  }, []);
-};
-
-export const getRecords = () => read<FinanceRecord[]>(recordsKey, []);
+export const getRecords = () => read<FinanceRecord[]>(recordsKey(), []);
 
 export const addRecord = (record: Omit<FinanceRecord, "id" | "createdAt">) => {
   const nextRecord: FinanceRecord = {
@@ -122,39 +119,31 @@ export const addRecord = (record: Omit<FinanceRecord, "id" | "createdAt">) => {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString()
   };
-  write(recordsKey, [nextRecord, ...getRecords()]);
+  write(recordsKey(), [nextRecord, ...getRecords()]);
 };
 
 export const updateRecord = (id: string, patch: Partial<FinanceRecord>) => {
   write(
-    recordsKey,
+    recordsKey(),
     getRecords().map(record => (record.id === id ? { ...record, ...patch } : record))
   );
 };
 
 export const deleteRecord = (id: string) => {
-  write(recordsKey, getRecords().filter(record => record.id !== id));
+  write(recordsKey(), getRecords().filter(record => record.id !== id));
 };
 
 export const clearAllRecords = () => {
-  write(recordsKey, []);
+  write(recordsKey(), []);
 };
 
 export const getCategories = (kind: RecordKind) => {
-  const custom = read<Partial<Record<RecordKind, string[]>>>(categoriesKey, {});
+  const custom = read<Partial<Record<RecordKind, string[]>>>(categoriesKey(), {});
   return Array.from(new Set([...(defaultCategories[kind] ?? []), ...(custom[kind] ?? [])])).sort();
 };
 
 export const addCategory = (kind: RecordKind, name: string) => {
-  const custom = read<Partial<Record<RecordKind, string[]>>>(categoriesKey, {});
+  const custom = read<Partial<Record<RecordKind, string[]>>>(categoriesKey(), {});
   custom[kind] = Array.from(new Set([...(custom[kind] ?? []), name]));
-  write(categoriesKey, custom);
-};
-
-export const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0
-  }).format(value);
+  write(categoriesKey(), custom);
 };

@@ -1,5 +1,5 @@
 import { Box, Card, Chip, LinearProgress, Stack, Typography } from "@mui/material";
-import { formatCurrency } from "../services/financeService";
+import { formatCurrency } from "../utils/formatters";
 
 interface StatCardProps {
   label: string;

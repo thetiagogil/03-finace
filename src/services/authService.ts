@@ -3,6 +3,7 @@ import type { User } from "../models/finance";
 
 const usersKey = "finace.users.v1";
 const sessionKey = "finace.session.v1";
+export const testUserId = "finace-test-user";
 
 interface StoredUser extends User {
   passwordHash: string;
@@ -38,11 +39,33 @@ const hash = (value: string) => {
 
 const getUsers = () => read<StoredUser[]>(usersKey, []);
 
+const getPublicUser = (user: StoredUser): User => ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  isTestUser: user.isTestUser
+});
+
+const ensureTestUser = () => {
+  const users = getUsers();
+  const existingUser = users.find(user => user.id === testUserId);
+  if (existingUser) return existingUser;
+  const testUser: StoredUser = {
+    id: testUserId,
+    name: "Test User",
+    email: "test@finace.local",
+    passwordHash: hash("test-user"),
+    isTestUser: true
+  };
+  write(usersKey, [...users, testUser]);
+  return testUser;
+};
+
 export const getCurrentUser = (): User | null => {
   const userId = read<string | null>(sessionKey, null);
   if (!userId) return null;
   const user = getUsers().find(item => item.id === userId);
-  return user ? { id: user.id, name: user.name, email: user.email } : null;
+  return user ? getPublicUser(user) : null;
 };
 
 export const signup = (input: { name: string; email: string; password: string }) => {
@@ -60,7 +83,7 @@ export const signup = (input: { name: string; email: string; password: string })
   };
   write(usersKey, [...users, user]);
   write(sessionKey, user.id);
-  return { id: user.id, name: user.name, email: user.email };
+  return getPublicUser(user);
 };
 
 export const login = (input: { email: string; password: string }) => {
@@ -68,7 +91,13 @@ export const login = (input: { email: string; password: string }) => {
   const user = getUsers().find(item => item.email === email);
   if (!user || user.passwordHash !== hash(input.password)) throw new Error("Invalid email or password");
   write(sessionKey, user.id);
-  return { id: user.id, name: user.name, email: user.email };
+  return getPublicUser(user);
+};
+
+export const continueWithTestUser = () => {
+  const testUser = ensureTestUser();
+  write(sessionKey, testUser.id);
+  return getPublicUser(testUser);
 };
 
 export const logout = () => {

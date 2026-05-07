@@ -1,11 +1,12 @@
 import { Box, Card, Container, FormControl, InputLabel, MenuItem, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import { useMemo, useState } from "react";
-import type { FinanceRecord, ModeFilter, RecordKind, RecordMode } from "../models/finance";
-import { formatCurrency, useEnsureSeed, useRecords } from "../services/financeService";
+import type { FinanceRecord, ModeFilter, RecordKind } from "../models/finance";
+import { useRecords } from "../services/financeService";
+import { buildCategoryMonthPivot, emptyMonthTotals, getNetMonthTotals, shownModes } from "../utils/financeCalculations";
+import { formatCurrency } from "../utils/formatters";
 import { getYearOptions, monthLabels } from "../utils/period";
 
 export const LedgerPage = () => {
-  useEnsureSeed();
   const records = useRecords();
   const years = getYearOptions(records);
   const [year, setYear] = useState(new Date().getFullYear());
@@ -46,10 +47,8 @@ export const LedgerPage = () => {
   );
 };
 
-const shownModes = (mode: ModeFilter): RecordMode[] => (mode === "both" ? ["planned", "tracked"] : [mode]);
-
 const PivotSection = ({ title, kind, records, mode }: { title: string; kind: RecordKind; records: FinanceRecord[]; mode: ModeFilter }) => {
-  const data = buildPivot(records, kind);
+  const data = buildCategoryMonthPivot(records, kind);
   const modes = shownModes(mode);
   const color = kind === "income" ? "success.main" : "error.main";
   const softColor = kind === "income" ? "rgba(47,157,104,0.10)" : "rgba(196,74,54,0.10)";
@@ -75,7 +74,7 @@ const PivotSection = ({ title, kind, records, mode }: { title: string; kind: Rec
               <TableRow><TableCell colSpan={15} align="center" sx={{ py: 5, color: "text.secondary" }}>No {title.toLowerCase()} recorded for this year.</TableCell></TableRow>
             ) : (
               data.categories.flatMap(category => modes.map((currentMode, index) => {
-                const values = data.map.get(category) ?? emptyMonths();
+                const values = data.map.get(category) ?? emptyMonthTotals();
                 const total = values.reduce((sum, cell) => sum + cell[currentMode], 0);
                 return (
                   <TableRow key={`${category}-${currentMode}`}>
@@ -96,11 +95,7 @@ const PivotSection = ({ title, kind, records, mode }: { title: string; kind: Rec
 
 const NetSection = ({ records, mode }: { records: FinanceRecord[]; mode: ModeFilter }) => {
   const modes = shownModes(mode);
-  const net = emptyMonths();
-  records.forEach(record => {
-    const monthIndex = Number(record.date.slice(5, 7)) - 1;
-    net[monthIndex][record.mode] += record.kind === "income" ? record.amount : -record.amount;
-  });
+  const net = getNetMonthTotals(records);
 
   return (
     <Card variant="outlined" sx={{ borderRadius: 3, overflow: "hidden" }}>
@@ -132,17 +127,4 @@ const NetSection = ({ records, mode }: { records: FinanceRecord[]; mode: ModeFil
       </Box>
     </Card>
   );
-};
-
-const emptyMonths = () => Array.from({ length: 12 }, () => ({ planned: 0, tracked: 0 }));
-
-const buildPivot = (records: FinanceRecord[], kind: RecordKind) => {
-  const map = new Map<string, Array<{ planned: number; tracked: number }>>();
-  records.filter(record => record.kind === kind).forEach(record => {
-    if (!map.has(record.category)) map.set(record.category, emptyMonths());
-    const monthIndex = Number(record.date.slice(5, 7)) - 1;
-    const cell = map.get(record.category)?.[monthIndex];
-    if (cell) cell[record.mode] += record.amount;
-  });
-  return { categories: Array.from(map.keys()).sort(), map };
 };

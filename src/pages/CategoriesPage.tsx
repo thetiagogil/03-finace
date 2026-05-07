@@ -1,27 +1,20 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { Box, Button, Card, Container, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { ConfirmAction } from "../components/ConfirmAction";
 import type { RecordKind } from "../models/finance";
-import { addCategory, clearAllRecords, formatCurrency, getCategories, useEnsureSeed, useRecords } from "../services/financeService";
+import { addCategory, clearAllRecords, getCategories, useRecords } from "../services/financeService";
+import { getCategoryUsage } from "../utils/financeCalculations";
+import { formatCurrency } from "../utils/formatters";
 
 export const CategoriesPage = () => {
-  useEnsureSeed();
   const records = useRecords();
   const [kind, setKind] = useState<RecordKind>("expense");
   const [name, setName] = useState("");
   const categories = getCategories(kind);
 
-  const usage = useMemo(() => {
-    const map = new Map<string, { count: number; total: number }>();
-    records.filter(record => record.kind === kind).forEach(record => {
-      const current = map.get(record.category) ?? { count: 0, total: 0 };
-      current.count += 1;
-      current.total += record.amount;
-      map.set(record.category, current);
-    });
-    return map;
-  }, [kind, records]);
+  const usage = getCategoryUsage(records, kind);
 
   const handleAdd = () => {
     const trimmedName = name.trim();
@@ -39,7 +32,9 @@ export const CategoriesPage = () => {
             <Typography variant="h3">Categories</Typography>
             <Typography color="text.secondary" sx={{ mt: 1 }}>Organize your income and expenses.</Typography>
           </Box>
-          <Button variant="outlined" color="error" startIcon={<DeleteOutlineIcon />} onClick={clearAllRecords}>Reset all data</Button>
+          <ConfirmAction title="Reset all data?" description="This removes every local record for the current user. Categories stay available, but the records cannot be restored." confirmLabel="Reset data" onConfirm={clearAllRecords}>
+            <Button variant="outlined" color="error" startIcon={<DeleteOutlineIcon />}>Reset all data</Button>
+          </ConfirmAction>
         </Stack>
 
         <Card variant="outlined" sx={{ p: 3, borderRadius: 3 }}>

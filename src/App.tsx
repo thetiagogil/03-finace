@@ -1,6 +1,7 @@
 import { CssBaseline, GlobalStyles, ThemeProvider } from "@mui/material";
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { PageShell } from "./components/PageShell";
+import { ProtectedRoute, PublicOnlyRoute } from "./components/RouteGuard";
 import { CategoriesPage } from "./pages/CategoriesPage";
 import { ComparePage } from "./pages/ComparePage";
 import { DashboardPage } from "./pages/DashboardPage";
@@ -9,7 +10,6 @@ import { LandingPage } from "./pages/LandingPage";
 import { LoginPage, SignupPage } from "./pages/AuthPages";
 import { RecordsPage } from "./pages/RecordsPage";
 import { TrendsPage } from "./pages/TrendsPage";
-import { useAuth } from "./services/authService";
 import { appTheme } from "./theme/theme";
 
 const App = () => {
@@ -28,30 +28,20 @@ const App = () => {
         <PageShell>
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<PublicOnly><LoginPage /></PublicOnly>} />
-            <Route path="/signup" element={<PublicOnly><SignupPage /></PublicOnly>} />
-            <Route path="/dashboard" element={<Protected><DashboardPage /></Protected>} />
-            <Route path="/records" element={<Protected><RecordsPage /></Protected>} />
-            <Route path="/ledger" element={<Protected><LedgerPage /></Protected>} />
-            <Route path="/compare" element={<Protected><ComparePage /></Protected>} />
-            <Route path="/trends" element={<Protected><TrendsPage /></Protected>} />
-            <Route path="/categories" element={<Protected><CategoriesPage /></Protected>} />
+            <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
+            <Route path="/signup" element={<PublicOnlyRoute><SignupPage /></PublicOnlyRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/records" element={<ProtectedRoute><RecordsPage /></ProtectedRoute>} />
+            <Route path="/ledger" element={<ProtectedRoute><LedgerPage /></ProtectedRoute>} />
+            <Route path="/compare" element={<ProtectedRoute><ComparePage /></ProtectedRoute>} />
+            <Route path="/trends" element={<ProtectedRoute><TrendsPage /></ProtectedRoute>} />
+            <Route path="/categories" element={<ProtectedRoute><CategoriesPage /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </PageShell>
       </Router>
     </ThemeProvider>
   );
-};
-
-const Protected = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
-};
-
-const PublicOnly = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <Navigate to="/dashboard" replace /> : children;
 };
 
 export default App;

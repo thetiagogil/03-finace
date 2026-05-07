@@ -1,7 +1,8 @@
 import { Alert, Box, Button, Card, Container, Stack, TextField, Typography } from "@mui/material";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login, signup } from "../services/authService";
+import { continueWithTestUser, login, signup } from "../services/authService";
+import { seedTestUserRecords } from "../services/financeService";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -24,7 +25,13 @@ export const LoginPage = () => {
     }
   };
 
-  return <AuthCard eyebrow="Welcome back" title="Sign in" subtitle="Your data lives only in this browser." onSubmit={handleSubmit} error={error} loading={loading} button="Sign in" footerText="No account?" footerLink="/signup" footerAction="Create one" fields={<><TextField label="Email" type="email" required value={email} onChange={event => setEmail(event.target.value)} /><TextField label="Password" type="password" required value={password} onChange={event => setPassword(event.target.value)} /></>} />;
+  const handleTestUser = () => {
+    continueWithTestUser();
+    seedTestUserRecords();
+    navigate("/dashboard");
+  };
+
+  return <AuthCard eyebrow="Welcome back" title="Sign in" subtitle="Use a local browser-only profile. No data is sent to a server." onSubmit={handleSubmit} error={error} loading={loading} button="Sign in" footerText="No account?" footerLink="/signup" footerAction="Create one" testAction={handleTestUser} fields={<><TextField label="Email" type="email" required value={email} onChange={event => setEmail(event.target.value)} /><TextField label="Password" type="password" required value={password} onChange={event => setPassword(event.target.value)} /></>} />;
 };
 
 export const SignupPage = () => {
@@ -49,7 +56,7 @@ export const SignupPage = () => {
     }
   };
 
-  return <AuthCard eyebrow="Get started" title="Create account" subtitle="Stored locally, no server and no email verification." onSubmit={handleSubmit} error={error} loading={loading} button="Create account" footerText="Already have an account?" footerLink="/login" footerAction="Sign in" fields={<><TextField label="Name" required value={name} onChange={event => setName(event.target.value)} /><TextField label="Email" type="email" required value={email} onChange={event => setEmail(event.target.value)} /><TextField label="Password" type="password" required helperText="At least 6 characters." value={password} onChange={event => setPassword(event.target.value)} /></>} />;
+  return <AuthCard eyebrow="Get started" title="Create local profile" subtitle="New profiles start empty and store data only in this browser." onSubmit={handleSubmit} error={error} loading={loading} button="Create profile" footerText="Already have an account?" footerLink="/login" footerAction="Sign in" fields={<><TextField label="Name" required value={name} onChange={event => setName(event.target.value)} /><TextField label="Email" type="email" required value={email} onChange={event => setEmail(event.target.value)} /><TextField label="Password" type="password" required helperText="At least 6 characters." value={password} onChange={event => setPassword(event.target.value)} /></>} />;
 };
 
 const AuthCard = ({
@@ -63,7 +70,8 @@ const AuthCard = ({
   button,
   footerText,
   footerLink,
-  footerAction
+  footerAction,
+  testAction
 }: {
   eyebrow: string;
   title: string;
@@ -76,6 +84,7 @@ const AuthCard = ({
   footerText: string;
   footerLink: string;
   footerAction: string;
+  testAction?: () => void;
 }) => (
   <Container maxWidth="sm">
     <Box sx={{ minHeight: "calc(100vh - 96px)", display: "flex", alignItems: "center", px: 1 }}>
@@ -87,6 +96,7 @@ const AuthCard = ({
           {fields}
           {error && <Alert severity="error">{error}</Alert>}
           <Button type="submit" variant="contained" disabled={loading}>{loading ? "Please wait..." : button}</Button>
+          {testAction && <Button type="button" variant="outlined" onClick={testAction}>Continue with test user</Button>}
         </Stack>
         <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 3 }}>
           {footerText} <Typography component={Link} to={footerLink} sx={{ color: "text.primary", fontWeight: 700, textDecoration: "none" }}>{footerAction}</Typography>

@@ -3,11 +3,12 @@ import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { PeriodFilter } from "../components/PeriodFilter";
 import type { RecordKind } from "../models/finance";
-import { formatCurrency, useEnsureSeed, useRecords } from "../services/financeService";
-import { allMonths, getPeriodLabel, getYearOptions, periodMatches } from "../utils/period";
+import { useRecords } from "../services/financeService";
+import { getCompareRows } from "../utils/financeCalculations";
+import { formatChartValue, formatCurrency } from "../utils/formatters";
+import { allMonths, getPeriodLabel, getYearOptions } from "../utils/period";
 
 export const ComparePage = () => {
-  useEnsureSeed();
   const records = useRecords();
   const years = getYearOptions(records);
   const [year, setYear] = useState(new Date().getFullYear());
@@ -15,16 +16,7 @@ export const ComparePage = () => {
   const [kind, setKind] = useState<RecordKind>("expense");
 
   const rows = useMemo(() => {
-    const inPeriod = periodMatches(year, month);
-    const map = new Map<string, { planned: number; tracked: number }>();
-    records.filter(record => record.kind === kind && inPeriod(record.date)).forEach(record => {
-      const current = map.get(record.category) ?? { planned: 0, tracked: 0 };
-      current[record.mode] += record.amount;
-      map.set(record.category, current);
-    });
-    return Array.from(map.entries())
-      .map(([category, value]) => ({ category, ...value, diff: value.tracked - value.planned, percent: value.planned ? (value.tracked / value.planned) * 100 : null }))
-      .sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+    return getCompareRows(records, kind, year, month);
   }, [kind, month, records, year]);
 
   const totals = rows.reduce((sum, row) => ({ planned: sum.planned + row.planned, tracked: sum.tracked + row.tracked }), { planned: 0, tracked: 0 });
@@ -101,7 +93,3 @@ const Stat = ({ label, value, color = "text.primary" }: { label: string; value: 
     <Typography variant="h4" sx={{ mt: 1, color, fontWeight: 700 }}>{value}</Typography>
   </Card>
 );
-
-const formatChartValue = (value: unknown) => {
-  return typeof value === "number" ? formatCurrency(value) : String(value ?? "");
-};

@@ -1,31 +1,15 @@
 import { Box, Card, Container, Stack, Typography } from "@mui/material";
 import { useMemo } from "react";
 import { Area, AreaChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { formatCurrency, useEnsureSeed, useRecords } from "../services/financeService";
+import { useRecords } from "../services/financeService";
+import { getTrendSeries } from "../utils/financeCalculations";
+import { formatChartValue } from "../utils/formatters";
 
 export const TrendsPage = () => {
-  useEnsureSeed();
   const records = useRecords();
 
   const monthly = useMemo(() => {
-    const map = new Map<string, { month: string; incomePlanned: number; incomeTracked: number; expensePlanned: number; expenseTracked: number }>();
-    records.forEach(record => {
-      const key = record.date.slice(0, 7);
-      const current = map.get(key) ?? { month: key, incomePlanned: 0, incomeTracked: 0, expensePlanned: 0, expenseTracked: 0 };
-      if (record.kind === "income" && record.mode === "planned") current.incomePlanned += record.amount;
-      if (record.kind === "income" && record.mode === "tracked") current.incomeTracked += record.amount;
-      if (record.kind === "expense" && record.mode === "planned") current.expensePlanned += record.amount;
-      if (record.kind === "expense" && record.mode === "tracked") current.expenseTracked += record.amount;
-      map.set(key, current);
-    });
-    return Array.from(map.values())
-      .sort((a, b) => a.month.localeCompare(b.month))
-      .map(item => ({
-        ...item,
-        label: new Date(`${item.month}-01`).toLocaleString(undefined, { month: "short", year: "2-digit" }),
-        netPlanned: item.incomePlanned - item.expensePlanned,
-        netTracked: item.incomeTracked - item.expenseTracked
-      }));
+    return getTrendSeries(records);
   }, [records]);
 
   return (
@@ -85,7 +69,3 @@ const TrendLine = ({ title, plannedKey, trackedKey, trackedColor, data }: { titl
     </ResponsiveContainer>
   </ChartCard>
 );
-
-const formatChartValue = (value: unknown) => {
-  return typeof value === "number" ? formatCurrency(value) : String(value ?? "");
-};
