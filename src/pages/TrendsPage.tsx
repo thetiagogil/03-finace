@@ -4,6 +4,7 @@ import { Area, AreaChart, CartesianGrid, Legend, Line, LineChart, ResponsiveCont
 import { EmptyState } from "../components/EmptyState";
 import { useRecords } from "../services/financeService";
 import { getTrendSeries } from "../utils/financeCalculations";
+import { financeColors, getFinanceColor } from "../utils/financeColors";
 import { formatChartValue, formatCurrencyAxis } from "../utils/formatters";
 
 export const TrendsPage = () => {
@@ -29,22 +30,22 @@ export const TrendsPage = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={monthly}>
                   <defs>
-                    <linearGradient id="netTracked" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#243d73" stopOpacity={0.3} /><stop offset="100%" stopColor="#243d73" stopOpacity={0} /></linearGradient>
-                    <linearGradient id="netPlanned" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5a75bd" stopOpacity={0.25} /><stop offset="100%" stopColor="#5a75bd" stopOpacity={0} /></linearGradient>
+                    <linearGradient id="netTracked" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={financeColors.trackedIncome} stopOpacity={0.3} /><stop offset="100%" stopColor={financeColors.trackedIncome} stopOpacity={0} /></linearGradient>
+                    <linearGradient id="netPlanned" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={financeColors.plannedIncome} stopOpacity={0.25} /><stop offset="100%" stopColor={financeColors.plannedIncome} stopOpacity={0} /></linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e7ef" vertical={false} />
                   <XAxis dataKey="label" stroke="#69758a" fontSize={12} />
                   <YAxis stroke="#69758a" fontSize={12} tickFormatter={formatCurrencyAxis} />
                   <Tooltip formatter={formatChartValue} />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Area type="monotone" dataKey="netTracked" stroke="#243d73" fill="url(#netTracked)" strokeWidth={2} name="Tracked net" />
-                  <Area type="monotone" dataKey="netPlanned" stroke="#5a75bd" fill="url(#netPlanned)" strokeDasharray="4 4" name="Planned net" />
+                  <Area type="monotone" dataKey="netTracked" stroke={financeColors.trackedIncome} fill="url(#netTracked)" strokeWidth={2} name="Tracked net" />
+                  <Area type="monotone" dataKey="netPlanned" stroke={financeColors.plannedIncome} fill="url(#netPlanned)" strokeDasharray="4 4" name="Planned net" />
                 </AreaChart>
               </ResponsiveContainer>
             </ChartCard>
             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "repeat(2, 1fr)" }, gap: 3 }}>
-              <TrendLine title="Income trend" plannedKey="incomePlanned" trackedKey="incomeTracked" trackedColor="#2f9d68" data={monthly} />
-              <TrendLine title="Expense trend" plannedKey="expensePlanned" trackedKey="expenseTracked" trackedColor="#c44a36" data={monthly} />
+              <TrendLine title="Income trend" plannedKey="incomePlanned" trackedKey="incomeTracked" trackedColor={getFinanceColor("income", "tracked")} plannedColor={getFinanceColor("income", "planned")} data={monthly} />
+              <TrendLine title="Expense trend" plannedKey="expensePlanned" trackedKey="expenseTracked" trackedColor={getFinanceColor("expense", "tracked")} plannedColor={getFinanceColor("expense", "planned")} data={monthly} />
             </Box>
           </>
         )}
@@ -61,7 +62,7 @@ const ChartCard = ({ title, subtitle, children }: { title: string; subtitle: str
   </Card>
 );
 
-const TrendLine = ({ title, plannedKey, trackedKey, trackedColor, data }: { title: string; plannedKey: string; trackedKey: string; trackedColor: string; data: object[] }) => (
+const TrendLine = ({ title, plannedKey, trackedKey, trackedColor, plannedColor, data }: { title: string; plannedKey: string; trackedKey: string; trackedColor: string; plannedColor: string; data: object[] }) => (
   <ChartCard title={title} subtitle="Tracked vs planned">
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={data}>
@@ -71,7 +72,7 @@ const TrendLine = ({ title, plannedKey, trackedKey, trackedColor, data }: { titl
         <Tooltip formatter={formatChartValue} />
         <Legend wrapperStyle={{ fontSize: 12 }} />
         <Line type="monotone" dataKey={trackedKey} stroke={trackedColor} strokeWidth={2} name="Tracked" dot={{ r: 3 }} />
-        <Line type="monotone" dataKey={plannedKey} stroke="#5a75bd" strokeDasharray="4 4" name="Planned" dot={false} />
+        <Line type="monotone" dataKey={plannedKey} stroke={plannedColor} strokeDasharray="4 4" name="Planned" dot={false} />
       </LineChart>
     </ResponsiveContainer>
   </ChartCard>

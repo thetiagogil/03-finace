@@ -32,6 +32,7 @@ import {
   getMonthlyNetSeries,
   sumRecords,
 } from "../utils/financeCalculations";
+import { financeColors } from "../utils/financeColors";
 import {
   formatChartValue,
   formatCurrency,
@@ -174,13 +175,13 @@ export const DashboardPage = () => {
                       <Legend wrapperStyle={{ fontSize: 12 }} />
                       <Bar
                         dataKey="tracked"
-                        fill="#243d73"
+                        fill={financeColors.trackedIncome}
                         name="Tracked"
                         radius={[4, 4, 0, 0]}
                       />
                       <Bar
                         dataKey="planned"
-                        fill="#5a75bd"
+                        fill={financeColors.plannedIncome}
                         name="Planned"
                         radius={[4, 4, 0, 0]}
                       />
@@ -222,10 +223,16 @@ export const DashboardPage = () => {
                     />
                   ) : (
                     topExpenses.map((item) => {
-                      const percent =
+                      const trackedPercentOfPlan =
                         item.planned > 0
                           ? Math.min(100, (item.tracked / item.planned) * 100)
-                          : 100;
+                          : item.tracked > 0
+                            ? 100
+                            : 0;
+                      const hasExceededPlan =
+                        item.planned > 0
+                          ? item.tracked > item.planned
+                          : item.tracked > 0;
                       return (
                         <Box key={item.category}>
                           <Stack
@@ -246,16 +253,15 @@ export const DashboardPage = () => {
                           </Stack>
                           <LinearProgress
                             variant="determinate"
-                            value={percent}
+                            value={trackedPercentOfPlan}
                             sx={{
                               height: 6,
                               borderRadius: 999,
-                              bgcolor: "rgba(105,117,138,0.16)",
+                              bgcolor: financeColors.plannedExpenseSoft,
                               "& .MuiLinearProgress-bar": {
-                                bgcolor:
-                                  item.tracked > item.planned
-                                    ? "error.main"
-                                    : "primary.main",
+                                bgcolor: hasExceededPlan
+                                  ? financeColors.trackedExpense
+                                  : financeColors.trackedExpenseMuted,
                               },
                             }}
                           />
@@ -280,7 +286,7 @@ export const DashboardPage = () => {
                 value={String(monthRecords.length)}
               />
               <Callout
-                icon={<TrendingUpIcon color="success" />}
+                icon={<TrendingUpIcon sx={{ color: financeColors.trackedIncome }} />}
                 label="Income vs. plan"
                 value={
                   incomePlan
@@ -289,7 +295,7 @@ export const DashboardPage = () => {
                 }
               />
               <Callout
-                icon={<TrendingDownIcon color="error" />}
+                icon={<TrendingDownIcon sx={{ color: financeColors.trackedExpense }} />}
                 label="Spending vs. plan"
                 value={
                   expensePlan

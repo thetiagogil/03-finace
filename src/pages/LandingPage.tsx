@@ -16,6 +16,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { continueWithTestUser, useAuth } from "../services/authService";
 import { seedTestUserRecords } from "../services/financeService";
+import { financeColors } from "../utils/financeColors";
 
 export const LandingPage = () => {
   const { isAuthenticated } = useAuth();
@@ -58,7 +59,7 @@ export const LandingPage = () => {
             What you{" "}
             <Box
               component="span"
-              sx={{ color: "#5a75bd", fontStyle: "italic" }}
+              sx={{ color: financeColors.plannedIncome, fontStyle: "italic" }}
             >
               planned
             </Box>
@@ -67,7 +68,7 @@ export const LandingPage = () => {
             What actually{" "}
             <Box
               component="span"
-              sx={{ color: "error.main", fontStyle: "italic" }}
+              sx={{ color: financeColors.trackedIncome, fontStyle: "italic" }}
             >
               happened
             </Box>
@@ -156,10 +157,10 @@ export const LandingPage = () => {
             <Tile
               label="Tracked"
               value="€3,580"
-              color="#c44a36"
+              color={financeColors.trackedIncome}
               delta="+12% vs plan"
             />
-            <Tile label="Planned" value="€3,200" color="#5a75bd" />
+            <Tile label="Planned" value="€3,200" color={financeColors.plannedIncome} />
           </Stack>
           <Stack spacing={2} sx={{ mt: 3 }}>
             {[
@@ -195,8 +196,8 @@ export const LandingPage = () => {
                       "& .MuiLinearProgress-bar": {
                         bgcolor:
                           item.tracked > item.planned
-                            ? "error.main"
-                            : "primary.main",
+                            ? financeColors.trackedExpense
+                            : financeColors.plannedExpense,
                       },
                     }}
                   />

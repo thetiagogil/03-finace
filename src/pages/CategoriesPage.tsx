@@ -22,6 +22,11 @@ import {
   useRecords,
 } from "../services/financeService";
 import { getCategoryUsage } from "../utils/financeCalculations";
+import {
+  getFinanceColor,
+  getFinanceSoftColor,
+  getFinanceToggleSx,
+} from "../utils/financeColors";
 import { formatCurrency } from "../utils/formatters";
 
 export const CategoriesPage = () => {
@@ -81,25 +86,39 @@ export const CategoriesPage = () => {
           </ConfirmAction>
         </Stack>
 
-        <Card variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
+        <Card variant="outlined" sx={{ p: 2.5, borderRadius: 3 }}>
           <Stack spacing={2}>
             <ToggleButtonGroup
               exclusive
+              size="small"
               value={kind}
               onChange={(_, value: RecordKind | null) =>
                 value && setKind(value)
               }
               sx={{ alignSelf: "flex-start" }}
             >
-              <ToggleButton value="income" color="success">
+              <ToggleButton
+                value="income"
+                sx={getFinanceToggleSx(
+                  getFinanceColor("income", "tracked"),
+                  getFinanceSoftColor("income", "tracked"),
+                )}
+              >
                 Income
               </ToggleButton>
-              <ToggleButton value="expense" color="error">
+              <ToggleButton
+                value="expense"
+                sx={getFinanceToggleSx(
+                  getFinanceColor("expense", "tracked"),
+                  getFinanceSoftColor("expense", "tracked"),
+                )}
+              >
                 Expense
               </ToggleButton>
             </ToggleButtonGroup>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ sm: "center" }}>
               <TextField
+                size="small"
                 label="Add a new category"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
@@ -110,9 +129,11 @@ export const CategoriesPage = () => {
                 onKeyDown={(event) => event.key === "Enter" && handleAdd()}
               />
               <Button
+                size="small"
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={handleAdd}
+                sx={{ minHeight: 40, px: 2.5 }}
               >
                 Add
               </Button>
@@ -165,7 +186,7 @@ export const CategoriesPage = () => {
                   variant="h4"
                   sx={{
                     mt: 1,
-                    color: kind === "income" ? "success.main" : "error.main",
+                    color: getFinanceColor(kind, "tracked"),
                     fontWeight: 700,
                   }}
                 >

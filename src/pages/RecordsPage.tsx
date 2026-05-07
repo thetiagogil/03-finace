@@ -34,6 +34,7 @@ import {
   getFilteredRecords,
   getRecordTotals,
 } from "../utils/financeCalculations";
+import { financeColors, getFinanceColor, getFinanceSoftColor } from "../utils/financeColors";
 import { formatCurrency } from "../utils/formatters";
 import { allMonths, getPeriodLabel, getYearOptions } from "../utils/period";
 
@@ -43,7 +44,7 @@ export const RecordsPage = () => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(allMonths);
   const [mode, setMode] = useState<ModeFilter>("tracked");
-  const [kind, setKind] = useState<"all" | RecordKind>("all");
+  const [kind, setKind] = useState<"all" | RecordKind>("income");
   const [search, setSearch] = useState("");
 
   const filteredRecords = useMemo(() => {
@@ -103,17 +104,17 @@ export const RecordsPage = () => {
           <Summary
             label="Total income"
             value={formatCurrency(totals.income)}
-            color="success.main"
+            color={financeColors.trackedIncome}
           />
           <Summary
             label="Total expense"
             value={formatCurrency(totals.expense)}
-            color="error.main"
+            color={financeColors.trackedExpense}
           />
           <Summary
             label="Net"
             value={formatCurrency(totals.net)}
-            color={totals.net >= 0 ? "success.main" : "error.main"}
+            color={totals.net >= 0 ? financeColors.trackedIncome : financeColors.trackedExpense}
           />
         </Box>
 
@@ -159,9 +160,9 @@ export const RecordsPage = () => {
                     setKind(event.target.value as "all" | RecordKind)
                   }
                 >
-                  <MenuItem value="all">All types</MenuItem>
                   <MenuItem value="income">Income</MenuItem>
                   <MenuItem value="expense">Expense</MenuItem>
+                  <MenuItem value="all">All types</MenuItem>
                 </Select>
               </FormControl>
             </Stack>
@@ -231,7 +232,11 @@ export const RecordsPage = () => {
                           size="small"
                           variant="outlined"
                           label={record.kind}
-                          color={record.kind === "income" ? "success" : "error"}
+                          sx={{
+                            color: getFinanceColor(record.kind, record.mode),
+                            borderColor: getFinanceColor(record.kind, record.mode),
+                            bgcolor: getFinanceSoftColor(record.kind, record.mode),
+                          }}
                         />
                       </TableCell>
                       <TableCell>
@@ -240,10 +245,7 @@ export const RecordsPage = () => {
                           sx={{
                             textTransform: "uppercase",
                             letterSpacing: "0.12em",
-                            color:
-                              record.mode === "planned"
-                                ? "#5a75bd"
-                                : "text.primary",
+                            color: getFinanceColor(record.kind, record.mode),
                             fontWeight: record.mode === "tracked" ? 700 : 500,
                           }}
                         >
@@ -268,10 +270,7 @@ export const RecordsPage = () => {
                       <TableCell
                         align="right"
                         sx={{
-                          color:
-                            record.kind === "income"
-                              ? "success.main"
-                              : "error.main",
+                          color: getFinanceColor(record.kind, record.mode),
                           fontWeight: 700,
                         }}
                       >

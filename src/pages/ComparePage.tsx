@@ -6,6 +6,7 @@ import { PeriodFilter } from "../components/PeriodFilter";
 import type { RecordKind } from "../models/finance";
 import { useRecords } from "../services/financeService";
 import { getCompareRows } from "../utils/financeCalculations";
+import { getFinanceColor } from "../utils/financeColors";
 import { formatChartValue, formatCurrency, formatCurrencyAxis } from "../utils/formatters";
 import { allMonths, getPeriodLabel, getYearOptions } from "../utils/period";
 
@@ -39,8 +40,8 @@ export const ComparePage = () => {
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
             <PeriodFilter year={year} month={month} years={years} onChange={next => { setYear(next.year); setMonth(next.month); }} />
             <FormControl size="small" sx={{ minWidth: 140 }}>
-              <InputLabel>Kind</InputLabel>
-              <Select label="Kind" value={kind} onChange={event => setKind(event.target.value as RecordKind)}>
+              <InputLabel>Type</InputLabel>
+              <Select label="Type" value={kind} onChange={event => setKind(event.target.value as RecordKind)}>
                 <MenuItem value="income">Income</MenuItem>
                 <MenuItem value="expense">Expenses</MenuItem>
               </Select>
@@ -65,8 +66,8 @@ export const ComparePage = () => {
                   <YAxis dataKey="category" type="category" stroke="#69758a" fontSize={12} width={110} />
                   <Tooltip formatter={formatChartValue} />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="tracked" fill={kind === "expense" ? "#c44a36" : "#2f9d68"} name="Tracked" radius={[0, 4, 4, 0]} />
-                  <Bar dataKey="planned" fill="#5a75bd" name="Planned" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="tracked" fill={getFinanceColor(kind, "tracked")} name="Tracked" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="planned" fill={getFinanceColor(kind, "planned")} name="Planned" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Box>

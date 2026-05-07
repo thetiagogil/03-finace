@@ -2,6 +2,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl,
 import { useMemo, useState, type ReactNode } from "react";
 import type { FinanceRecord, RecordKind, RecordMode } from "../models/finance";
 import { addRecord, getCategories, updateRecord } from "../services/financeService";
+import { getFinanceColor, getFinanceSoftColor, getFinanceToggleSx, getModeColor, getModeSoftColor } from "../utils/financeColors";
 
 interface RecordDialogProps {
   trigger: ReactNode;
@@ -78,15 +79,15 @@ export const RecordDialog = ({ trigger, defaultKind = "income", defaultMode = "t
               <Stack spacing={1} flex={1}>
                 <Typography variant="body2" fontWeight={600}>Type</Typography>
                 <ToggleButtonGroup exclusive fullWidth value={kind} onChange={(_, value: RecordKind | null) => value && setKind(value)}>
-                  <ToggleButton value="income" color="success">Income</ToggleButton>
-                  <ToggleButton value="expense" color="error">Expense</ToggleButton>
+                  <ToggleButton value="income" sx={getFinanceToggleSx(getFinanceColor("income", "tracked"), getFinanceSoftColor("income", "tracked"))}>Income</ToggleButton>
+                  <ToggleButton value="expense" sx={getFinanceToggleSx(getFinanceColor("expense", "tracked"), getFinanceSoftColor("expense", "tracked"))}>Expense</ToggleButton>
                 </ToggleButtonGroup>
               </Stack>
               <Stack spacing={1} flex={1}>
                 <Typography variant="body2" fontWeight={600}>Mode</Typography>
                 <ToggleButtonGroup exclusive fullWidth value={mode} onChange={(_, value: RecordMode | null) => value && setMode(value)}>
-                  <ToggleButton value="tracked">Tracked</ToggleButton>
-                  <ToggleButton value="planned">Planned</ToggleButton>
+                  <ToggleButton value="tracked" sx={getFinanceToggleSx(getModeColor("tracked"), getModeSoftColor("tracked"))}>Tracked</ToggleButton>
+                  <ToggleButton value="planned" sx={getFinanceToggleSx(getModeColor("planned"), getModeSoftColor("planned"))}>Planned</ToggleButton>
                 </ToggleButtonGroup>
               </Stack>
             </Stack>

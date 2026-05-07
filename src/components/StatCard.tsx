@@ -1,4 +1,5 @@
 import { Box, Card, Chip, LinearProgress, Stack, Typography } from "@mui/material";
+import { financeColors, getFinanceColor } from "../utils/financeColors";
 import { formatCurrency } from "../utils/formatters";
 
 interface StatCardProps {
@@ -12,7 +13,8 @@ export const StatCard = ({ label, planned, tracked, tone = "neutral" }: StatCard
   const diff = tracked - planned;
   const diffGood = tone === "expense" ? diff <= 0 : diff >= 0;
   const percent = planned !== 0 ? (tracked / planned) * 100 : 0;
-  const accent = tone === "income" ? "success.main" : tone === "expense" ? "error.main" : "primary.main";
+  const trackedColor = tone === "income" ? getFinanceColor("income", "tracked") : tone === "expense" ? getFinanceColor("expense", "tracked") : tracked >= 0 ? financeColors.trackedIncome : financeColors.trackedExpense;
+  const plannedColor = tone === "income" ? getFinanceColor("income", "planned") : tone === "expense" ? getFinanceColor("expense", "planned") : planned >= 0 ? financeColors.plannedIncome : financeColors.plannedExpense;
 
   return (
     <Card variant="outlined" sx={{ p: 2.5, borderRadius: 3 }}>
@@ -25,18 +27,18 @@ export const StatCard = ({ label, planned, tracked, tone = "neutral" }: StatCard
             size="small"
             label={`${diff >= 0 ? "+" : ""}${formatCurrency(diff)}`}
             sx={{
-              bgcolor: diffGood ? "success.light" : "error.light",
-              color: diffGood ? "success.main" : "error.main",
+              bgcolor: diffGood ? financeColors.trackedIncomeSoft : financeColors.trackedExpenseSoft,
+              color: diffGood ? financeColors.trackedIncome : financeColors.trackedExpense,
               fontWeight: 700
             }}
           />
         </Stack>
         <Box>
-          <Typography variant="h4" sx={{ color: accent, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+          <Typography variant="h4" sx={{ color: trackedColor, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
             {formatCurrency(tracked)}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Planned <Box component="span" sx={{ color: "text.primary" }}>{formatCurrency(planned)}</Box>
+            Planned <Box component="span" sx={{ color: plannedColor }}>{formatCurrency(planned)}</Box>
           </Typography>
         </Box>
         <Box>
@@ -47,7 +49,7 @@ export const StatCard = ({ label, planned, tracked, tone = "neutral" }: StatCard
               height: 6,
               borderRadius: 999,
               bgcolor: "rgba(105, 117, 138, 0.16)",
-              "& .MuiLinearProgress-bar": { bgcolor: accent }
+              "& .MuiLinearProgress-bar": { bgcolor: trackedColor }
             }}
           />
           <Typography variant="caption" color="text.secondary">
