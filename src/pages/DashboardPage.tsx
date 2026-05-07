@@ -6,11 +6,12 @@ import WalletOutlinedIcon from "@mui/icons-material/WalletOutlined";
 import { Box, Button, Card, Container, LinearProgress, Stack, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { EmptyState } from "../components/EmptyState";
 import { RecordDialog } from "../components/RecordDialog";
 import { StatCard } from "../components/StatCard";
 import { useRecords } from "../services/financeService";
 import { getCategoryTotals, getMonthlyNetSeries, sumRecords } from "../utils/financeCalculations";
-import { formatChartValue, formatCurrency } from "../utils/formatters";
+import { formatChartValue, formatCurrency, formatCurrencyAxis } from "../utils/formatters";
 
 export const DashboardPage = () => {
   const records = useRecords();
@@ -28,6 +29,7 @@ export const DashboardPage = () => {
   const monthly = getMonthlyNetSeries(records, now);
 
   const topExpenses = getCategoryTotals(monthRecords.filter(record => record.kind === "expense")).slice(0, 5);
+  const hasRecords = records.length > 0;
 
   return (
     <Container maxWidth="xl" sx={{ py: 5 }}>
@@ -43,75 +45,80 @@ export const DashboardPage = () => {
             </Typography>
           </Box>
           <Stack direction="row" spacing={1.5}>
-            <RecordDialog defaultKind="income" defaultMode="tracked" trigger={<Button variant="outlined" startIcon={<TrendingUpIcon color="success" />}>Income</Button>} />
-            <RecordDialog defaultKind="expense" defaultMode="tracked" trigger={<Button variant="contained" startIcon={<AddIcon />}>New record</Button>} />
+            <RecordDialog trigger={<Button variant="contained" startIcon={<AddIcon />}>New record</Button>} />
           </Stack>
         </Stack>
 
-        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, gap: 2 }}>
-          <StatCard label="Income" planned={incomePlan} tracked={incomeTrack} tone="income" />
-          <StatCard label="Expenses" planned={expensePlan} tracked={expenseTrack} tone="expense" />
-          <StatCard label="Net" planned={netPlan} tracked={netTrack} />
-        </Box>
-
-        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "2fr 1fr" }, gap: 3 }}>
-          <Card variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
-            <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
-              <Box>
-                <Typography variant="h6" fontWeight={700}>Net by month</Typography>
-                <Typography variant="caption" color="text.secondary">Planned vs. tracked, last 6 months</Typography>
-              </Box>
-              <Button component={Link} to="/trends" size="small" endIcon={<ArrowForwardIcon />}>Trends</Button>
-            </Stack>
-            <Box sx={{ height: 300 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthly} barCategoryGap={20}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e7ef" vertical={false} />
-                  <XAxis dataKey="month" stroke="#69758a" fontSize={12} />
-                  <YAxis stroke="#69758a" fontSize={12} tickFormatter={value => `$${value}`} />
-                  <Tooltip formatter={formatChartValue} />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="planned" fill="#5a75bd" name="Planned" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="tracked" fill="#243d73" name="Tracked" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+        {hasRecords ? (
+          <>
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, gap: 2 }}>
+              <StatCard label="Income" planned={incomePlan} tracked={incomeTrack} tone="income" />
+              <StatCard label="Expenses" planned={expensePlan} tracked={expenseTrack} tone="expense" />
+              <StatCard label="Net" planned={netPlan} tracked={netTrack} />
             </Box>
-          </Card>
 
-          <Card variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
-            <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
-              <Box>
-                <Typography variant="h6" fontWeight={700}>Top expenses</Typography>
-                <Typography variant="caption" color="text.secondary">This month, by category</Typography>
-              </Box>
-              <Button component={Link} to="/compare" size="small" endIcon={<ArrowForwardIcon />}>Compare</Button>
-            </Stack>
-            <Stack spacing={2.5}>
-              {topExpenses.length === 0 ? (
-                <Typography variant="body2" color="text.secondary">No expenses yet this month.</Typography>
-              ) : (
-                topExpenses.map(item => {
-                  const percent = item.planned > 0 ? Math.min(100, (item.tracked / item.planned) * 100) : 100;
-                  return (
-                    <Box key={item.category}>
-                      <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.75 }}>
-                        <Typography variant="body2" fontWeight={600}>{item.category}</Typography>
-                        <Typography variant="caption" color="text.secondary">{formatCurrency(item.tracked)} / {formatCurrency(item.planned)}</Typography>
-                      </Stack>
-                      <LinearProgress variant="determinate" value={percent} sx={{ height: 6, borderRadius: 999, bgcolor: "rgba(105,117,138,0.16)", "& .MuiLinearProgress-bar": { bgcolor: item.tracked > item.planned ? "error.main" : "primary.main" } }} />
-                    </Box>
-                  );
-                })
-              )}
-            </Stack>
-          </Card>
-        </Box>
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "2fr 1fr" }, gap: 3 }}>
+              <Card variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
+                <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
+                  <Box>
+                    <Typography variant="h6" fontWeight={700}>Net by month</Typography>
+                    <Typography variant="caption" color="text.secondary">Planned vs. tracked, last 6 months</Typography>
+                  </Box>
+                  <Button component={Link} to="/trends" size="small" endIcon={<ArrowForwardIcon />}>Trends</Button>
+                </Stack>
+                <Box sx={{ height: 300 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={monthly} barCategoryGap={20}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e7ef" vertical={false} />
+                      <XAxis dataKey="month" stroke="#69758a" fontSize={12} />
+                      <YAxis stroke="#69758a" fontSize={12} tickFormatter={formatCurrencyAxis} />
+                      <Tooltip formatter={formatChartValue} />
+                      <Legend wrapperStyle={{ fontSize: 12 }} />
+                      <Bar dataKey="planned" fill="#5a75bd" name="Planned" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="tracked" fill="#243d73" name="Tracked" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </Box>
+              </Card>
 
-        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" }, gap: 2 }}>
-          <Callout icon={<WalletOutlinedIcon />} label="Records this month" value={String(monthRecords.length)} />
-          <Callout icon={<TrendingUpIcon color="success" />} label="Income vs. plan" value={incomePlan ? `${Math.round((incomeTrack / incomePlan) * 100)}%` : "-"} />
-          <Callout icon={<TrendingDownIcon color="error" />} label="Spending vs. plan" value={expensePlan ? `${Math.round((expenseTrack / expensePlan) * 100)}%` : "-"} />
-        </Box>
+              <Card variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
+                <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
+                  <Box>
+                    <Typography variant="h6" fontWeight={700}>Top expenses</Typography>
+                    <Typography variant="caption" color="text.secondary">This month, by category</Typography>
+                  </Box>
+                  <Button component={Link} to="/compare" size="small" endIcon={<ArrowForwardIcon />}>Compare</Button>
+                </Stack>
+                <Stack spacing={2.5}>
+                  {topExpenses.length === 0 ? (
+                    <EmptyState title="No expenses this month" description="Add tracked or planned expense records for this month to see the largest categories here." compact variant="plain" />
+                  ) : (
+                    topExpenses.map(item => {
+                      const percent = item.planned > 0 ? Math.min(100, (item.tracked / item.planned) * 100) : 100;
+                      return (
+                        <Box key={item.category}>
+                          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.75 }}>
+                            <Typography variant="body2" fontWeight={600}>{item.category}</Typography>
+                            <Typography variant="caption" color="text.secondary">{formatCurrency(item.tracked)} / {formatCurrency(item.planned)}</Typography>
+                          </Stack>
+                          <LinearProgress variant="determinate" value={percent} sx={{ height: 6, borderRadius: 999, bgcolor: "rgba(105,117,138,0.16)", "& .MuiLinearProgress-bar": { bgcolor: item.tracked > item.planned ? "error.main" : "primary.main" } }} />
+                        </Box>
+                      );
+                    })
+                  )}
+                </Stack>
+              </Card>
+            </Box>
+
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" }, gap: 2 }}>
+              <Callout icon={<WalletOutlinedIcon />} label="Records this month" value={String(monthRecords.length)} />
+              <Callout icon={<TrendingUpIcon color="success" />} label="Income vs. plan" value={incomePlan ? `${Math.round((incomeTrack / incomePlan) * 100)}%` : "-"} />
+              <Callout icon={<TrendingDownIcon color="error" />} label="Spending vs. plan" value={expensePlan ? `${Math.round((expenseTrack / expensePlan) * 100)}%` : "-"} />
+            </Box>
+          </>
+        ) : (
+          <EmptyState title="No finance records yet" description="Create your first planned or tracked record to unlock dashboard totals, charts, and monthly comparisons." />
+        )}
       </Stack>
     </Container>
   );

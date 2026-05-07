@@ -5,6 +5,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Box, Button, Card, Chip, Container, FormControl, IconButton, InputAdornment, InputLabel, MenuItem, Select, Stack, Table, TableBody, TableCell, TableFooter, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { useMemo, useState } from "react";
 import { ConfirmAction } from "../components/ConfirmAction";
+import { EmptyState } from "../components/EmptyState";
 import { PeriodFilter } from "../components/PeriodFilter";
 import { RecordDialog } from "../components/RecordDialog";
 import type { ModeFilter, RecordKind } from "../models/finance";
@@ -27,6 +28,10 @@ export const RecordsPage = () => {
   }, [kind, mode, month, records, search, year]);
 
   const totals = getRecordTotals(filteredRecords);
+  const emptyTitle = records.length === 0 ? "No records yet" : "No records match these filters";
+  const emptyDescription = records.length === 0
+    ? "Create your first planned or tracked record to start building your finance history."
+    : "Adjust the period, type, mode, or search term to find matching records.";
 
   return (
     <Container maxWidth="xl" sx={{ py: 5 }}>
@@ -94,7 +99,9 @@ export const RecordsPage = () => {
               <TableBody>
                 {filteredRecords.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} align="center" sx={{ py: 6, color: "text.secondary" }}>No records match your filters.</TableCell>
+                    <TableCell colSpan={7} sx={{ py: 3 }}>
+                      <EmptyState title={emptyTitle} description={emptyDescription} compact variant="plain" />
+                    </TableCell>
                   </TableRow>
                 ) : (
                   filteredRecords.map(record => (

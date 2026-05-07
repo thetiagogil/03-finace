@@ -1,5 +1,6 @@
 import { Box, Card, Container, FormControl, InputLabel, MenuItem, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import { useMemo, useState } from "react";
+import { EmptyState } from "../components/EmptyState";
 import type { FinanceRecord, ModeFilter, RecordKind } from "../models/finance";
 import { useRecords } from "../services/financeService";
 import { buildCategoryMonthPivot, emptyMonthTotals, getNetMonthTotals, shownModes } from "../utils/financeCalculations";
@@ -12,6 +13,10 @@ export const LedgerPage = () => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [mode, setMode] = useState<ModeFilter>("both");
   const yearRecords = useMemo(() => records.filter(record => record.date.startsWith(String(year))), [records, year]);
+  const emptyTitle = records.length === 0 ? "No ledger data yet" : `No records in ${year}`;
+  const emptyDescription = records.length === 0
+    ? "Create records first, then the ledger will group them by category and month."
+    : "Choose another year or add records for this year to build the ledger view.";
 
   return (
     <Container maxWidth="xl" sx={{ py: 5 }}>
@@ -39,9 +44,15 @@ export const LedgerPage = () => {
             </FormControl>
           </Stack>
         </Stack>
-        <PivotSection title="Income" kind="income" records={yearRecords} mode={mode} />
-        <PivotSection title="Expenses" kind="expense" records={yearRecords} mode={mode} />
-        <NetSection records={yearRecords} mode={mode} />
+        {yearRecords.length === 0 ? (
+          <EmptyState title={emptyTitle} description={emptyDescription} />
+        ) : (
+          <>
+            <PivotSection title="Income" kind="income" records={yearRecords} mode={mode} />
+            <PivotSection title="Expenses" kind="expense" records={yearRecords} mode={mode} />
+            <NetSection records={yearRecords} mode={mode} />
+          </>
+        )}
       </Stack>
     </Container>
   );
@@ -71,7 +82,11 @@ const PivotSection = ({ title, kind, records, mode }: { title: string; kind: Rec
           </TableHead>
           <TableBody>
             {data.categories.length === 0 ? (
-              <TableRow><TableCell colSpan={15} align="center" sx={{ py: 5, color: "text.secondary" }}>No {title.toLowerCase()} recorded for this year.</TableCell></TableRow>
+              <TableRow>
+                <TableCell colSpan={15} sx={{ py: 3 }}>
+                  <EmptyState title={`No ${title.toLowerCase()} in this year`} description={`Add ${kind} records to populate this ledger section.`} compact variant="plain" />
+                </TableCell>
+              </TableRow>
             ) : (
               data.categories.flatMap(category => modes.map((currentMode, index) => {
                 const values = data.map.get(category) ?? emptyMonthTotals();

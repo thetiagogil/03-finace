@@ -3,6 +3,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { Box, Button, Card, Container, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { useState } from "react";
 import { ConfirmAction } from "../components/ConfirmAction";
+import { EmptyState } from "../components/EmptyState";
 import type { RecordKind } from "../models/finance";
 import { addCategory, clearAllRecords, getCategories, useRecords } from "../services/financeService";
 import { getCategoryUsage } from "../utils/financeCalculations";
@@ -15,6 +16,7 @@ export const CategoriesPage = () => {
   const categories = getCategories(kind);
 
   const usage = getCategoryUsage(records, kind);
+  const hasRecordsForKind = usage.size > 0;
 
   const handleAdd = () => {
     const trimmedName = name.trim();
@@ -49,6 +51,10 @@ export const CategoriesPage = () => {
             </Stack>
           </Stack>
         </Card>
+
+        {!hasRecordsForKind && (
+          <EmptyState title={`No ${kind} records yet`} description={`The default ${kind} categories are ready. Once you create records, their totals will appear below.`} compact />
+        )}
 
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }, gap: 2 }}>
           {categories.map(category => {

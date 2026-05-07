@@ -1,11 +1,12 @@
 import { Box, Card, Container, FormControl, InputLabel, MenuItem, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { EmptyState } from "../components/EmptyState";
 import { PeriodFilter } from "../components/PeriodFilter";
 import type { RecordKind } from "../models/finance";
 import { useRecords } from "../services/financeService";
 import { getCompareRows } from "../utils/financeCalculations";
-import { formatChartValue, formatCurrency } from "../utils/formatters";
+import { formatChartValue, formatCurrency, formatCurrencyAxis } from "../utils/formatters";
 import { allMonths, getPeriodLabel, getYearOptions } from "../utils/period";
 
 export const ComparePage = () => {
@@ -21,6 +22,10 @@ export const ComparePage = () => {
 
   const totals = rows.reduce((sum, row) => ({ planned: sum.planned + row.planned, tracked: sum.tracked + row.tracked }), { planned: 0, tracked: 0 });
   const riskCount = kind === "expense" ? rows.filter(row => row.diff > 0).length : rows.filter(row => row.diff < 0).length;
+  const emptyTitle = records.length === 0 ? "No records to compare" : `No ${kind} records for this period`;
+  const emptyDescription = records.length === 0
+    ? "Add planned and tracked records to compare your intentions against reality."
+    : "Change the period or type filter, or add records for this selection.";
 
   return (
     <Container maxWidth="xl" sx={{ py: 5 }}>
@@ -49,25 +54,35 @@ export const ComparePage = () => {
         </Box>
         <Card variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
           <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>By category</Typography>
-          <Box sx={{ height: 360 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={rows} layout="vertical" margin={{ left: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e7ef" horizontal={false} />
-                <XAxis type="number" stroke="#69758a" fontSize={12} tickFormatter={value => `$${value}`} />
-                <YAxis dataKey="category" type="category" stroke="#69758a" fontSize={12} width={110} />
-                <Tooltip formatter={formatChartValue} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Bar dataKey="planned" fill="#5a75bd" name="Planned" radius={[0, 4, 4, 0]} />
-                <Bar dataKey="tracked" fill={kind === "expense" ? "#c44a36" : "#2f9d68"} name="Tracked" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </Box>
+          {rows.length === 0 ? (
+            <EmptyState title={emptyTitle} description={emptyDescription} compact variant="plain" />
+          ) : (
+            <Box sx={{ height: 360 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={rows} layout="vertical" margin={{ left: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e7ef" horizontal={false} />
+                  <XAxis type="number" stroke="#69758a" fontSize={12} tickFormatter={formatCurrencyAxis} />
+                  <YAxis dataKey="category" type="category" stroke="#69758a" fontSize={12} width={110} />
+                  <Tooltip formatter={formatChartValue} />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <Bar dataKey="planned" fill="#5a75bd" name="Planned" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="tracked" fill={kind === "expense" ? "#c44a36" : "#2f9d68"} name="Tracked" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </Box>
+          )}
         </Card>
         <Card variant="outlined" sx={{ borderRadius: 3, overflow: "hidden" }}>
           <Table>
             <TableHead><TableRow><TableCell>Category</TableCell><TableCell align="right">Planned</TableCell><TableCell align="right">Tracked</TableCell><TableCell align="right">Diff</TableCell><TableCell align="right">% of plan</TableCell></TableRow></TableHead>
             <TableBody>
-              {rows.map(row => {
+              {rows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} sx={{ py: 3 }}>
+                    <EmptyState title={emptyTitle} description={emptyDescription} compact variant="plain" />
+                  </TableCell>
+                </TableRow>
+              ) : rows.map(row => {
                 const bad = kind === "expense" ? row.diff > 0 : row.diff < 0;
                 return (
                   <TableRow key={row.category}>

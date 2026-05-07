@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import type { User } from "../models/finance";
+import { capitalizeFirstLetter } from "../utils/text";
 
 const usersKey = "finace.users.v1";
 const sessionKey = "finace.session.v1";
@@ -41,7 +42,7 @@ const getUsers = () => read<StoredUser[]>(usersKey, []);
 
 const getPublicUser = (user: StoredUser): User => ({
   id: user.id,
-  name: user.name,
+  name: capitalizeFirstLetter(user.name),
   email: user.email,
   isTestUser: user.isTestUser
 });

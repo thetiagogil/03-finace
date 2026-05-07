@@ -12,6 +12,7 @@ import type { SvgIconComponent } from "@mui/icons-material";
 import { useState, type ReactNode } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { logout, useAuth } from "../services/authService";
+import { capitalizeFirstLetter } from "../utils/text";
 
 interface PageShellProps {
   children: ReactNode;
@@ -37,6 +38,7 @@ export const PageShell = ({ children }: PageShellProps) => {
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  const displayName = user ? capitalizeFirstLetter(user.name) : "";
 
   const handleLogout = () => {
     logout();
@@ -89,12 +91,12 @@ export const PageShell = ({ children }: PageShellProps) => {
                 <>
                   <Button variant="outlined" startIcon={<AccountCircleOutlinedIcon />} onClick={event => setAnchor(event.currentTarget)}>
                     <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
-                      {user.name}
+                      {displayName}
                     </Box>
                   </Button>
                   <Menu anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}>
                     <Box sx={{ px: 2, py: 1 }}>
-                      <Typography fontWeight={600}>{user.name}</Typography>
+                      <Typography fontWeight={600}>{displayName}</Typography>
                       <Typography variant="caption" color="text.secondary">
                         {user.email}
                       </Typography>

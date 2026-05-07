@@ -153,10 +153,10 @@ export const LandingPage = () => {
             </Typography>
           </Stack>
           <Stack direction="row" spacing={1.5}>
-            <Tile label="Planned" value="$3,200" color="#5a75bd" />
+            <Tile label="Planned" value="€3,200" color="#5a75bd" />
             <Tile
               label="Tracked"
-              value="$3,580"
+              value="€3,580"
               color="#c44a36"
               delta="+12% vs plan"
             />
@@ -182,7 +182,7 @@ export const LandingPage = () => {
                       {item.label}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      ${item.tracked} / ${item.planned}
+                      €{item.tracked} / €{item.planned}
                     </Typography>
                   </Stack>
                   <LinearProgress
