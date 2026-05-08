@@ -28,28 +28,32 @@ import { ConfirmAction } from "../components/ConfirmAction";
 import { EmptyState } from "../components/EmptyState";
 import { PeriodFilter } from "../components/PeriodFilter";
 import { RecordDialog } from "../components/RecordDialog";
-import type { ModeFilter, RecordKind } from "../models/finance";
+import type { ModeFilter, RecordType } from "../types/financeRecord";
 import { deleteRecord, useRecords } from "../services/financeService";
 import {
   getFilteredRecords,
   getRecordTotals,
-} from "../utils/financeCalculations";
-import { financeColors, getFinanceColor, getFinanceSoftColor } from "../utils/financeColors";
-import { formatCurrency } from "../utils/formatters";
-import { allMonths, getPeriodLabel, getYearOptions } from "../utils/period";
+} from "../lib/utils/financeCalculations";
+import {
+  FINANCE_COLORS,
+  getFinanceColor,
+  getFinanceSoftColor,
+} from "../lib/utils/financeColors";
+import { formatCurrency } from "../lib/utils/formatters";
+import { ALL_MONTHS, getPeriodLabel, getYearOptions } from "../lib/utils/period";
 
 export const RecordsPage = () => {
   const records = useRecords();
   const years = getYearOptions(records);
   const [year, setYear] = useState(new Date().getFullYear());
-  const [month, setMonth] = useState(allMonths);
+  const [month, setMonth] = useState(ALL_MONTHS);
   const [mode, setMode] = useState<ModeFilter>("tracked");
-  const [kind, setKind] = useState<"all" | RecordKind>("income");
+  const [type, setType] = useState<"all" | RecordType>("all");
   const [search, setSearch] = useState("");
 
   const filteredRecords = useMemo(() => {
-    return getFilteredRecords(records, { year, month, mode, kind, search });
-  }, [kind, mode, month, records, search, year]);
+    return getFilteredRecords(records, { year, month, mode, type, search });
+  }, [type, mode, month, records, search, year]);
 
   const totals = getRecordTotals(filteredRecords);
   const emptyTitle =
@@ -104,17 +108,21 @@ export const RecordsPage = () => {
           <Summary
             label="Total income"
             value={formatCurrency(totals.income)}
-            color={financeColors.trackedIncome}
+            color={FINANCE_COLORS.trackedIncome}
           />
           <Summary
             label="Total expense"
             value={formatCurrency(totals.expense)}
-            color={financeColors.trackedExpense}
+            color={FINANCE_COLORS.trackedExpense}
           />
           <Summary
             label="Net"
             value={formatCurrency(totals.net)}
-            color={totals.net >= 0 ? financeColors.trackedIncome : financeColors.trackedExpense}
+            color={
+              totals.net >= 0
+                ? FINANCE_COLORS.trackedIncome
+                : FINANCE_COLORS.trackedExpense
+            }
           />
         </Box>
 
@@ -155,14 +163,14 @@ export const RecordsPage = () => {
                 <InputLabel>Type</InputLabel>
                 <Select
                   label="Type"
-                  value={kind}
+                  value={type}
                   onChange={(event) =>
-                    setKind(event.target.value as "all" | RecordKind)
+                    setType(event.target.value as "all" | RecordType)
                   }
                 >
+                  <MenuItem value="all">All types</MenuItem>
                   <MenuItem value="income">Income</MenuItem>
                   <MenuItem value="expense">Expense</MenuItem>
-                  <MenuItem value="all">All types</MenuItem>
                 </Select>
               </FormControl>
             </Stack>
@@ -231,11 +239,17 @@ export const RecordsPage = () => {
                         <Chip
                           size="small"
                           variant="outlined"
-                          label={record.kind}
+                          label={record.type}
                           sx={{
-                            color: getFinanceColor(record.kind, record.mode),
-                            borderColor: getFinanceColor(record.kind, record.mode),
-                            bgcolor: getFinanceSoftColor(record.kind, record.mode),
+                            color: getFinanceColor(record.type, record.mode),
+                            borderColor: getFinanceColor(
+                              record.type,
+                              record.mode,
+                            ),
+                            bgcolor: getFinanceSoftColor(
+                              record.type,
+                              record.mode,
+                            ),
                           }}
                         />
                       </TableCell>
@@ -245,7 +259,7 @@ export const RecordsPage = () => {
                           sx={{
                             textTransform: "uppercase",
                             letterSpacing: "0.12em",
-                            color: getFinanceColor(record.kind, record.mode),
+                            color: getFinanceColor(record.type, record.mode),
                             fontWeight: record.mode === "tracked" ? 700 : 500,
                           }}
                         >
@@ -270,11 +284,11 @@ export const RecordsPage = () => {
                       <TableCell
                         align="right"
                         sx={{
-                          color: getFinanceColor(record.kind, record.mode),
+                          color: getFinanceColor(record.type, record.mode),
                           fontWeight: 700,
                         }}
                       >
-                        {record.kind === "income" ? "+" : "-"}
+                        {record.type === "income" ? "+" : "-"}
                         {formatCurrency(record.amount)}
                       </TableCell>
                       <TableCell align="right">

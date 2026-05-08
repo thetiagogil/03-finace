@@ -31,13 +31,13 @@ import {
   getCategoryTotals,
   getMonthlyNetSeries,
   sumRecords,
-} from "../utils/financeCalculations";
-import { financeColors } from "../utils/financeColors";
+} from "../lib/utils/financeCalculations";
+import { FINANCE_COLORS } from "../lib/utils/financeColors";
 import {
   formatChartValue,
   formatCurrency,
   formatCurrencyAxis,
-} from "../utils/formatters";
+} from "../lib/utils/formatters";
 
 export const DashboardPage = () => {
   const records = useRecords();
@@ -57,7 +57,7 @@ export const DashboardPage = () => {
   const monthly = getMonthlyNetSeries(records, now);
 
   const topExpenses = getCategoryTotals(
-    monthRecords.filter((record) => record.kind === "expense"),
+    monthRecords.filter((record) => record.type === "expense"),
   ).slice(0, 5);
   const hasRecords = records.length > 0;
 
@@ -175,13 +175,13 @@ export const DashboardPage = () => {
                       <Legend wrapperStyle={{ fontSize: 12 }} />
                       <Bar
                         dataKey="tracked"
-                        fill={financeColors.trackedIncome}
+                        fill={FINANCE_COLORS.trackedIncome}
                         name="Tracked"
                         radius={[4, 4, 0, 0]}
                       />
                       <Bar
                         dataKey="planned"
-                        fill={financeColors.plannedIncome}
+                        fill={FINANCE_COLORS.plannedIncome}
                         name="Planned"
                         radius={[4, 4, 0, 0]}
                       />
@@ -257,11 +257,11 @@ export const DashboardPage = () => {
                             sx={{
                               height: 6,
                               borderRadius: 999,
-                              bgcolor: financeColors.plannedExpenseSoft,
+                              bgcolor: FINANCE_COLORS.plannedExpenseSoft,
                               "& .MuiLinearProgress-bar": {
                                 bgcolor: hasExceededPlan
-                                  ? financeColors.trackedExpense
-                                  : financeColors.trackedExpenseMuted,
+                                  ? FINANCE_COLORS.trackedExpense
+                                  : FINANCE_COLORS.trackedExpenseMuted,
                               },
                             }}
                           />
@@ -286,7 +286,7 @@ export const DashboardPage = () => {
                 value={String(monthRecords.length)}
               />
               <Callout
-                icon={<TrendingUpIcon sx={{ color: financeColors.trackedIncome }} />}
+                icon={<TrendingUpIcon sx={{ color: FINANCE_COLORS.trackedIncome }} />}
                 label="Income vs. plan"
                 value={
                   incomePlan
@@ -295,7 +295,7 @@ export const DashboardPage = () => {
                 }
               />
               <Callout
-                icon={<TrendingDownIcon sx={{ color: financeColors.trackedExpense }} />}
+                icon={<TrendingDownIcon sx={{ color: FINANCE_COLORS.trackedExpense }} />}
                 label="Spending vs. plan"
                 value={
                   expensePlan

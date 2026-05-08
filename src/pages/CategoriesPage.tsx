@@ -14,34 +14,34 @@ import {
 import { useState } from "react";
 import { ConfirmAction } from "../components/ConfirmAction";
 import { EmptyState } from "../components/EmptyState";
-import type { RecordKind } from "../models/finance";
+import type { RecordType } from "../types/financeRecord";
 import {
   addCategory,
   clearAllRecords,
   getCategories,
   useRecords,
 } from "../services/financeService";
-import { getCategoryUsage } from "../utils/financeCalculations";
+import { getCategoryUsage } from "../lib/utils/financeCalculations";
 import {
   getFinanceColor,
   getFinanceSoftColor,
   getFinanceToggleSx,
-} from "../utils/financeColors";
-import { formatCurrency } from "../utils/formatters";
+} from "../lib/utils/financeColors";
+import { formatCurrency } from "../lib/utils/formatters";
 
 export const CategoriesPage = () => {
   const records = useRecords();
-  const [kind, setKind] = useState<RecordKind>("income");
+  const [type, setType] = useState<RecordType>("income");
   const [name, setName] = useState("");
-  const categories = getCategories(kind);
+  const categories = getCategories(type);
 
-  const usage = getCategoryUsage(records, kind);
-  const hasRecordsForKind = usage.size > 0;
+  const usage = getCategoryUsage(records, type);
+  const hasRecordsForType = usage.size > 0;
 
   const handleAdd = () => {
     const trimmedName = name.trim();
     if (!trimmedName) return;
-    addCategory(kind, trimmedName);
+    addCategory(type, trimmedName);
     setName("");
   };
 
@@ -91,9 +91,9 @@ export const CategoriesPage = () => {
             <ToggleButtonGroup
               exclusive
               size="small"
-              value={kind}
-              onChange={(_, value: RecordKind | null) =>
-                value && setKind(value)
+              value={type}
+              onChange={(_, value: RecordType | null) =>
+                value && setType(value)
               }
               sx={{ alignSelf: "flex-start" }}
             >
@@ -123,7 +123,7 @@ export const CategoriesPage = () => {
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 placeholder={
-                  kind === "income" ? "e.g. Royalties" : "e.g. Childcare"
+                  type === "income" ? "e.g. Royalties" : "e.g. Childcare"
                 }
                 fullWidth
                 onKeyDown={(event) => event.key === "Enter" && handleAdd()}
@@ -141,10 +141,10 @@ export const CategoriesPage = () => {
           </Stack>
         </Card>
 
-        {!hasRecordsForKind && (
+        {!hasRecordsForType && (
           <EmptyState
-            title={`No ${kind} records yet`}
-            description={`The default ${kind} categories are ready. Once you create records, their totals will appear below.`}
+            title={`No ${type} records yet`}
+            description={`The default ${type} categories are ready. Once you create records, their totals will appear below.`}
             compact
           />
         )}
@@ -186,7 +186,7 @@ export const CategoriesPage = () => {
                   variant="h4"
                   sx={{
                     mt: 1,
-                    color: getFinanceColor(kind, "tracked"),
+                    color: getFinanceColor(type, "tracked"),
                     fontWeight: 700,
                   }}
                 >

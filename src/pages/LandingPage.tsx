@@ -15,8 +15,8 @@ import {
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { continueWithTestUser, useAuth } from "../services/authService";
-import { seedTestUserRecords } from "../services/financeService";
-import { financeColors } from "../utils/financeColors";
+import { seedTestUserRecords } from "../services/testDataService";
+import { FINANCE_COLORS } from "../lib/utils/financeColors";
 
 export const LandingPage = () => {
   const { isAuthenticated } = useAuth();
@@ -59,7 +59,7 @@ export const LandingPage = () => {
             What you{" "}
             <Box
               component="span"
-              sx={{ color: financeColors.plannedIncome, fontStyle: "italic" }}
+              sx={{ color: FINANCE_COLORS.plannedIncome, fontStyle: "italic" }}
             >
               planned
             </Box>
@@ -68,7 +68,7 @@ export const LandingPage = () => {
             What actually{" "}
             <Box
               component="span"
-              sx={{ color: financeColors.trackedIncome, fontStyle: "italic" }}
+              sx={{ color: FINANCE_COLORS.trackedIncome, fontStyle: "italic" }}
             >
               happened
             </Box>
@@ -157,10 +157,10 @@ export const LandingPage = () => {
             <Tile
               label="Tracked"
               value="€3,580"
-              color={financeColors.trackedIncome}
+              color={FINANCE_COLORS.trackedIncome}
               delta="+12% vs plan"
             />
-            <Tile label="Planned" value="€3,200" color={financeColors.plannedIncome} />
+            <Tile label="Planned" value="€3,200" color={FINANCE_COLORS.plannedIncome} />
           </Stack>
           <Stack spacing={2} sx={{ mt: 3 }}>
             {[
@@ -196,8 +196,8 @@ export const LandingPage = () => {
                       "& .MuiLinearProgress-bar": {
                         bgcolor:
                           item.tracked > item.planned
-                            ? financeColors.trackedExpense
-                            : financeColors.plannedExpense,
+                            ? FINANCE_COLORS.trackedExpense
+                            : FINANCE_COLORS.plannedExpense,
                       },
                     }}
                   />

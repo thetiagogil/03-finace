@@ -3,27 +3,27 @@ import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { EmptyState } from "../components/EmptyState";
 import { PeriodFilter } from "../components/PeriodFilter";
-import type { RecordKind } from "../models/finance";
+import type { RecordType } from "../types/financeRecord";
 import { useRecords } from "../services/financeService";
-import { getCompareRows } from "../utils/financeCalculations";
-import { getFinanceColor } from "../utils/financeColors";
-import { formatChartValue, formatCurrency, formatCurrencyAxis } from "../utils/formatters";
-import { allMonths, getPeriodLabel, getYearOptions } from "../utils/period";
+import { getCompareRows } from "../lib/utils/financeCalculations";
+import { getFinanceColor } from "../lib/utils/financeColors";
+import { formatChartValue, formatCurrency, formatCurrencyAxis } from "../lib/utils/formatters";
+import { ALL_MONTHS, getPeriodLabel, getYearOptions } from "../lib/utils/period";
 
 export const ComparePage = () => {
   const records = useRecords();
   const years = getYearOptions(records);
   const [year, setYear] = useState(new Date().getFullYear());
-  const [month, setMonth] = useState(allMonths);
-  const [kind, setKind] = useState<RecordKind>("income");
+  const [month, setMonth] = useState(ALL_MONTHS);
+  const [type, setType] = useState<RecordType>("income");
 
   const rows = useMemo(() => {
-    return getCompareRows(records, kind, year, month);
-  }, [kind, month, records, year]);
+    return getCompareRows(records, type, year, month);
+  }, [type, month, records, year]);
 
   const totals = rows.reduce((sum, row) => ({ planned: sum.planned + row.planned, tracked: sum.tracked + row.tracked }), { planned: 0, tracked: 0 });
-  const riskCount = kind === "expense" ? rows.filter(row => row.diff > 0).length : rows.filter(row => row.diff < 0).length;
-  const emptyTitle = records.length === 0 ? "No records to compare" : `No ${kind} records for this period`;
+  const riskCount = type === "expense" ? rows.filter(row => row.diff > 0).length : rows.filter(row => row.diff < 0).length;
+  const emptyTitle = records.length === 0 ? "No records to compare" : `No ${type} records for this period`;
   const emptyDescription = records.length === 0
     ? "Add planned and tracked records to compare your intentions against reality."
     : "Change the period or type filter, or add records for this selection.";
@@ -41,7 +41,7 @@ export const ComparePage = () => {
             <PeriodFilter year={year} month={month} years={years} onChange={next => { setYear(next.year); setMonth(next.month); }} />
             <FormControl size="small" sx={{ minWidth: 140 }}>
               <InputLabel>Type</InputLabel>
-              <Select label="Type" value={kind} onChange={event => setKind(event.target.value as RecordKind)}>
+              <Select label="Type" value={type} onChange={event => setType(event.target.value as RecordType)}>
                 <MenuItem value="income">Income</MenuItem>
                 <MenuItem value="expense">Expenses</MenuItem>
               </Select>
@@ -51,7 +51,7 @@ export const ComparePage = () => {
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, gap: 2 }}>
           <Stat label="Tracked total" value={formatCurrency(totals.tracked)} />
           <Stat label="Planned total" value={formatCurrency(totals.planned)} />
-          <Stat label={kind === "expense" ? "Over budget categories" : "Under target categories"} value={String(riskCount)} color="error.main" />
+          <Stat label={type === "expense" ? "Over budget categories" : "Under target categories"} value={String(riskCount)} color="error.main" />
         </Box>
         <Card variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
           <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>By category</Typography>
@@ -66,8 +66,8 @@ export const ComparePage = () => {
                   <YAxis dataKey="category" type="category" stroke="#69758a" fontSize={12} width={110} />
                   <Tooltip formatter={formatChartValue} />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="tracked" fill={getFinanceColor(kind, "tracked")} name="Tracked" radius={[0, 4, 4, 0]} />
-                  <Bar dataKey="planned" fill={getFinanceColor(kind, "planned")} name="Planned" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="tracked" fill={getFinanceColor(type, "tracked")} name="Tracked" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="planned" fill={getFinanceColor(type, "planned")} name="Planned" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Box>
@@ -84,7 +84,7 @@ export const ComparePage = () => {
                   </TableCell>
                 </TableRow>
               ) : rows.map(row => {
-                const bad = kind === "expense" ? row.diff > 0 : row.diff < 0;
+                const bad = type === "expense" ? row.diff > 0 : row.diff < 0;
                 return (
                   <TableRow key={row.category}>
                     <TableCell sx={{ fontWeight: 700 }}>{row.category}</TableCell>

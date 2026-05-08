@@ -1,87 +1,48 @@
 import { useSyncExternalStore } from "react";
-import type { FinanceRecord, RecordKind } from "../models/finance";
-import { getCurrentUser, testUserId } from "./authService";
-
-const recordsKeyPrefix = "finace.records";
-const categoriesKeyPrefix = "finace.categories";
+import { DEFAULT_CATEGORIES } from "../lib/constants/finance";
+import { STORAGE_KEYS } from "../lib/constants/storageKeys";
+import type { FinanceRecord, FinanceRecordInput, RecordType } from "../types/financeRecord";
+import { getCurrentUser } from "./authService";
+import { readStorage, writeStorage } from "./storageService";
 
 type Listener = () => void;
 
 const listeners = new Set<Listener>();
 const cache = new Map<string, FinanceRecord[]>();
-
-const defaultCategories: Record<RecordKind, string[]> = {
-  income: ["Salary", "Freelance", "Investments", "Side Project", "Other"],
-  expense: ["Housing", "Groceries", "Transport", "Dining", "Utilities", "Subscriptions", "Health", "Entertainment", "Travel", "Shopping", "Other"]
-};
+const emptyRecords: FinanceRecord[] = [];
 
 const emit = () => listeners.forEach(listener => listener());
 
 const getActiveUserId = () => getCurrentUser()?.id ?? "";
 
-const recordsKey = (userId = getActiveUserId()) => `${recordsKeyPrefix}.${userId}.v1`;
+const activeRecordsKey = () => STORAGE_KEYS.recordsForUser(getActiveUserId());
 
-const categoriesKey = (userId = getActiveUserId()) => `${categoriesKeyPrefix}.${userId}.v1`;
-
-const read = <T,>(key: string, fallback: T): T => {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
-};
+const activeCategoriesKey = () => STORAGE_KEYS.categoriesForUser(getActiveUserId());
 
 const write = (key: string, value: unknown) => {
-  localStorage.setItem(key, JSON.stringify(value));
+  writeStorage(key, value);
   emit();
 };
 
-const makeSeedRecord = (
-  kind: RecordKind,
-  mode: "planned" | "tracked",
-  category: string,
-  amount: number,
-  day: number,
-  monthOffset: number,
-  description?: string
-): FinanceRecord => {
-  const now = new Date();
-  const date = new Date(now.getFullYear(), now.getMonth() + monthOffset, day);
+const isRecordType = (value: unknown): value is RecordType => value === "income" || value === "expense";
+
+const normalizeRecord = (record: FinanceRecord): FinanceRecord | null => {
+  if (!isRecordType(record.type)) return null;
   return {
-    id: crypto.randomUUID(),
-    kind,
-    mode,
-    category,
-    amount,
-    date: date.toISOString().slice(0, 10),
-    description,
-    createdAt: new Date().toISOString()
+    id: record.id,
+    type: record.type,
+    mode: record.mode,
+    category: record.category,
+    subcategory: record.subcategory,
+    amount: record.amount,
+    date: record.date,
+    description: record.description,
+    createdAt: record.createdAt
   };
 };
 
-export const seedTestUserRecords = () => {
-  const key = recordsKey(testUserId);
-  const existingRecords = read<FinanceRecord[]>(key, []);
-  if (existingRecords.length > 0) return;
-  const records: FinanceRecord[] = [];
-  for (let monthOffset = -5; monthOffset <= 0; monthOffset += 1) {
-    records.push(makeSeedRecord("income", "planned", "Salary", 4200, 1, monthOffset));
-    records.push(makeSeedRecord("income", "tracked", "Salary", 4200, 1, monthOffset));
-    records.push(makeSeedRecord("income", "planned", "Freelance", 600, 15, monthOffset));
-    records.push(makeSeedRecord("income", "tracked", "Freelance", monthOffset === 0 ? 320 : 800, 18, monthOffset));
-    records.push(makeSeedRecord("expense", "planned", "Housing", 1400, 2, monthOffset));
-    records.push(makeSeedRecord("expense", "tracked", "Housing", 1400, 2, monthOffset));
-    records.push(makeSeedRecord("expense", "planned", "Groceries", 450, 6, monthOffset));
-    records.push(makeSeedRecord("expense", "tracked", "Groceries", 480 + monthOffset * 20, 8, monthOffset));
-    records.push(makeSeedRecord("expense", "planned", "Dining", 200, 10, monthOffset));
-    records.push(makeSeedRecord("expense", "tracked", "Dining", 280 - monthOffset * 15, 12, monthOffset));
-    records.push(makeSeedRecord("expense", "planned", "Transport", 120, 4, monthOffset));
-    records.push(makeSeedRecord("expense", "tracked", "Transport", 95, 4, monthOffset));
-    records.push(makeSeedRecord("expense", "planned", "Subscriptions", 60, 3, monthOffset));
-    records.push(makeSeedRecord("expense", "tracked", "Subscriptions", 72, 3, monthOffset));
-  }
-  write(key, records);
+const readRecords = (key: string) => {
+  return readStorage<FinanceRecord[]>(key, []).map(normalizeRecord).filter((record): record is FinanceRecord => Boolean(record));
 };
 
 const subscribe = (listener: Listener) => {
@@ -98,52 +59,58 @@ export const useRecords = () => {
   return useSyncExternalStore(
     subscribe,
     () => {
-      const key = recordsKey();
+      const key = activeRecordsKey();
       const json = localStorage.getItem(key) ?? "[]";
       const cacheKey = `${key}:${json}`;
       const cached = cache.get(cacheKey);
       if (cached) return cached;
-      const parsed = JSON.parse(json) as FinanceRecord[];
+      const parsed = readRecords(key);
       cache.set(cacheKey, parsed);
       return parsed;
     },
-    () => []
+    () => emptyRecords
   );
 };
 
-export const getRecords = () => read<FinanceRecord[]>(recordsKey(), []);
+export const getRecordsForUser = (userId: string) => readRecords(STORAGE_KEYS.recordsForUser(userId));
 
-export const addRecord = (record: Omit<FinanceRecord, "id" | "createdAt">) => {
+export const replaceRecordsForUser = (userId: string, records: FinanceRecord[]) => {
+  write(STORAGE_KEYS.recordsForUser(userId), records);
+};
+
+export const getRecords = () => readRecords(activeRecordsKey());
+
+export const addRecord = (record: FinanceRecordInput) => {
   const nextRecord: FinanceRecord = {
     ...record,
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString()
   };
-  write(recordsKey(), [nextRecord, ...getRecords()]);
+  write(activeRecordsKey(), [nextRecord, ...getRecords()]);
 };
 
 export const updateRecord = (id: string, patch: Partial<FinanceRecord>) => {
   write(
-    recordsKey(),
+    activeRecordsKey(),
     getRecords().map(record => (record.id === id ? { ...record, ...patch } : record))
   );
 };
 
 export const deleteRecord = (id: string) => {
-  write(recordsKey(), getRecords().filter(record => record.id !== id));
+  write(activeRecordsKey(), getRecords().filter(record => record.id !== id));
 };
 
 export const clearAllRecords = () => {
-  write(recordsKey(), []);
+  write(activeRecordsKey(), []);
 };
 
-export const getCategories = (kind: RecordKind) => {
-  const custom = read<Partial<Record<RecordKind, string[]>>>(categoriesKey(), {});
-  return Array.from(new Set([...(defaultCategories[kind] ?? []), ...(custom[kind] ?? [])])).sort();
+export const getCategories = (type: RecordType) => {
+  const custom = readStorage<Partial<Record<RecordType, string[]>>>(activeCategoriesKey(), {});
+  return Array.from(new Set([...(DEFAULT_CATEGORIES[type] ?? []), ...(custom[type] ?? [])])).sort();
 };
 
-export const addCategory = (kind: RecordKind, name: string) => {
-  const custom = read<Partial<Record<RecordKind, string[]>>>(categoriesKey(), {});
-  custom[kind] = Array.from(new Set([...(custom[kind] ?? []), name]));
-  write(categoriesKey(), custom);
+export const addCategory = (type: RecordType, name: string) => {
+  const custom = readStorage<Partial<Record<RecordType, string[]>>>(activeCategoriesKey(), {});
+  custom[type] = Array.from(new Set([...(custom[type] ?? []), name]));
+  write(activeCategoriesKey(), custom);
 };

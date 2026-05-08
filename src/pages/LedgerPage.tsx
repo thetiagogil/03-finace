@@ -16,17 +16,17 @@ import {
 } from "@mui/material";
 import { useMemo, useState } from "react";
 import { EmptyState } from "../components/EmptyState";
-import type { FinanceRecord, ModeFilter, RecordKind } from "../models/finance";
+import type { FinanceRecord, ModeFilter, RecordType } from "../types/financeRecord";
 import { useRecords } from "../services/financeService";
 import {
   buildCategoryMonthPivot,
   emptyMonthTotals,
   getNetMonthTotals,
   shownModes,
-} from "../utils/financeCalculations";
-import { financeColors, getFinanceColor } from "../utils/financeColors";
-import { formatCurrency } from "../utils/formatters";
-import { getYearOptions, monthLabels } from "../utils/period";
+} from "../lib/utils/financeCalculations";
+import { FINANCE_COLORS, getFinanceColor } from "../lib/utils/financeColors";
+import { formatCurrency } from "../lib/utils/formatters";
+import { getYearOptions, MONTH_LABELS } from "../lib/utils/period";
 
 export const LedgerPage = () => {
   const records = useRecords();
@@ -105,13 +105,13 @@ export const LedgerPage = () => {
           <>
             <PivotSection
               title="Income"
-              kind="income"
+              type="income"
               records={yearRecords}
               mode={mode}
             />
             <PivotSection
               title="Expenses"
-              kind="expense"
+              type="expense"
               records={yearRecords}
               mode={mode}
             />
@@ -125,16 +125,16 @@ export const LedgerPage = () => {
 
 const PivotSection = ({
   title,
-  kind,
+  type,
   records,
   mode,
 }: {
   title: string;
-  kind: RecordKind;
+  type: RecordType;
   records: FinanceRecord[];
   mode: ModeFilter;
 }) => {
-  const data = buildCategoryMonthPivot(records, kind);
+  const data = buildCategoryMonthPivot(records, type);
   const modes = shownModes(mode);
 
   return (
@@ -163,7 +163,7 @@ const PivotSection = ({
             <TableRow>
               <TableCell sx={{ minWidth: 180 }}>Category</TableCell>
               {mode === "both" && <TableCell>Mode</TableCell>}
-              {monthLabels.map((label) => (
+              {MONTH_LABELS.map((label) => (
                 <TableCell key={label} align="right">
                   {label.slice(0, 3)}
                 </TableCell>
@@ -177,7 +177,7 @@ const PivotSection = ({
                 <TableCell colSpan={15} sx={{ py: 3 }}>
                   <EmptyState
                     title={`No ${title.toLowerCase()} in this year`}
-                    description={`Add ${kind} records to populate this ledger section.`}
+                    description={`Add ${type} records to populate this ledger section.`}
                     compact
                     variant="plain"
                   />
@@ -208,7 +208,7 @@ const PivotSection = ({
                             sx={{
                               textTransform: "uppercase",
                               letterSpacing: "0.12em",
-                              color: getFinanceColor(kind, currentMode),
+                              color: getFinanceColor(type, currentMode),
                               fontWeight: currentMode === "tracked" ? 700 : 500,
                             }}
                           >
@@ -222,7 +222,7 @@ const PivotSection = ({
                           align="right"
                           sx={{
                             color: cell[currentMode]
-                              ? getFinanceColor(kind, currentMode)
+                              ? getFinanceColor(type, currentMode)
                               : "text.disabled",
                           }}
                         >
@@ -234,7 +234,7 @@ const PivotSection = ({
                       <TableCell
                         align="right"
                         sx={{
-                          color: getFinanceColor(kind, currentMode),
+                          color: getFinanceColor(type, currentMode),
                           fontWeight: 700,
                         }}
                       >
@@ -282,7 +282,7 @@ const NetSection = ({
           <TableHead>
             <TableRow>
               <TableCell sx={{ minWidth: 180 }}>Mode</TableCell>
-              {monthLabels.map((label) => (
+              {MONTH_LABELS.map((label) => (
                 <TableCell key={label} align="right">
                   {label.slice(0, 3)}
                 </TableCell>
@@ -317,8 +317,8 @@ const NetSection = ({
                       sx={{
                         color:
                           cell[currentMode] >= 0
-                            ? financeColors.trackedIncome
-                            : financeColors.trackedExpense,
+                            ? FINANCE_COLORS.trackedIncome
+                            : FINANCE_COLORS.trackedExpense,
                       }}
                     >
                       {cell[currentMode]
@@ -331,8 +331,8 @@ const NetSection = ({
                     sx={{
                       color:
                         total >= 0
-                          ? financeColors.trackedIncome
-                          : financeColors.trackedExpense,
+                          ? FINANCE_COLORS.trackedIncome
+                          : FINANCE_COLORS.trackedExpense,
                       fontWeight: 700,
                     }}
                   >

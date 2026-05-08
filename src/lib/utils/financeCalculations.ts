@@ -1,4 +1,4 @@
-import type { FinanceRecord, ModeFilter, RecordKind, RecordMode } from "../models/finance";
+import type { FinanceRecord, ModeFilter, RecordType, RecordMode } from "../../types/financeRecord";
 import { periodMatches } from "./period";
 
 export interface CategoryTotals {
@@ -7,15 +7,15 @@ export interface CategoryTotals {
   tracked: number;
 }
 
-export const sumRecords = (records: FinanceRecord[], kind: RecordKind, mode: RecordMode) => {
-  return records.filter(record => record.kind === kind && record.mode === mode).reduce((sum, record) => sum + record.amount, 0);
+export const sumRecords = (records: FinanceRecord[], type: RecordType, mode: RecordMode) => {
+  return records.filter(record => record.type === type && record.mode === mode).reduce((sum, record) => sum + record.amount, 0);
 };
 
 export const getRecordTotals = (records: FinanceRecord[]) => {
   const totals = records.reduce(
     (result, record) => ({
-      income: result.income + (record.kind === "income" ? record.amount : 0),
-      expense: result.expense + (record.kind === "expense" ? record.amount : 0)
+      income: result.income + (record.type === "income" ? record.amount : 0),
+      expense: result.expense + (record.type === "expense" ? record.amount : 0)
     }),
     { income: 0, expense: 0 }
   );
@@ -49,14 +49,14 @@ export const getMonthlyNetSeries = (records: FinanceRecord[], baseDate = new Dat
 
 export const getFilteredRecords = (
   records: FinanceRecord[],
-  filters: { year: number; month: string; mode: ModeFilter; kind: "all" | RecordKind; search: string }
+  filters: { year: number; month: string; mode: ModeFilter; type: "all" | RecordType; search: string }
 ) => {
   const inPeriod = periodMatches(filters.year, filters.month);
   const query = filters.search.trim().toLowerCase();
   return records
     .filter(record => inPeriod(record.date))
     .filter(record => (filters.mode === "both" ? true : record.mode === filters.mode))
-    .filter(record => (filters.kind === "all" ? true : record.kind === filters.kind))
+    .filter(record => (filters.type === "all" ? true : record.type === filters.type))
     .filter(record => {
       if (!query) return true;
       return record.category.toLowerCase().includes(query) || (record.subcategory ?? "").toLowerCase().includes(query) || (record.description ?? "").toLowerCase().includes(query);
@@ -64,10 +64,10 @@ export const getFilteredRecords = (
     .sort((a, b) => b.date.localeCompare(a.date));
 };
 
-export const getCompareRows = (records: FinanceRecord[], kind: RecordKind, year: number, month: string) => {
+export const getCompareRows = (records: FinanceRecord[], type: RecordType, year: number, month: string) => {
   const inPeriod = periodMatches(year, month);
   const map = new Map<string, { planned: number; tracked: number }>();
-  records.filter(record => record.kind === kind && inPeriod(record.date)).forEach(record => {
+  records.filter(record => record.type === type && inPeriod(record.date)).forEach(record => {
     const current = map.get(record.category) ?? { planned: 0, tracked: 0 };
     current[record.mode] += record.amount;
     map.set(record.category, current);
@@ -82,10 +82,10 @@ export const getTrendSeries = (records: FinanceRecord[]) => {
   records.forEach(record => {
     const key = record.date.slice(0, 7);
     const current = map.get(key) ?? { month: key, incomePlanned: 0, incomeTracked: 0, expensePlanned: 0, expenseTracked: 0 };
-    if (record.kind === "income" && record.mode === "planned") current.incomePlanned += record.amount;
-    if (record.kind === "income" && record.mode === "tracked") current.incomeTracked += record.amount;
-    if (record.kind === "expense" && record.mode === "planned") current.expensePlanned += record.amount;
-    if (record.kind === "expense" && record.mode === "tracked") current.expenseTracked += record.amount;
+    if (record.type === "income" && record.mode === "planned") current.incomePlanned += record.amount;
+    if (record.type === "income" && record.mode === "tracked") current.incomeTracked += record.amount;
+    if (record.type === "expense" && record.mode === "planned") current.expensePlanned += record.amount;
+    if (record.type === "expense" && record.mode === "tracked") current.expenseTracked += record.amount;
     map.set(key, current);
   });
   return Array.from(map.values())
@@ -98,9 +98,9 @@ export const getTrendSeries = (records: FinanceRecord[]) => {
     }));
 };
 
-export const getCategoryUsage = (records: FinanceRecord[], kind: RecordKind) => {
+export const getCategoryUsage = (records: FinanceRecord[], type: RecordType) => {
   const map = new Map<string, { count: number; total: number }>();
-  records.filter(record => record.kind === kind).forEach(record => {
+  records.filter(record => record.type === type).forEach(record => {
     const current = map.get(record.category) ?? { count: 0, total: 0 };
     current.count += 1;
     current.total += record.amount;
@@ -113,9 +113,9 @@ export const shownModes = (mode: ModeFilter): RecordMode[] => (mode === "both" ?
 
 export const emptyMonthTotals = () => Array.from({ length: 12 }, () => ({ planned: 0, tracked: 0 }));
 
-export const buildCategoryMonthPivot = (records: FinanceRecord[], kind: RecordKind) => {
+export const buildCategoryMonthPivot = (records: FinanceRecord[], type: RecordType) => {
   const map = new Map<string, Array<{ planned: number; tracked: number }>>();
-  records.filter(record => record.kind === kind).forEach(record => {
+  records.filter(record => record.type === type).forEach(record => {
     if (!map.has(record.category)) map.set(record.category, emptyMonthTotals());
     const monthIndex = Number(record.date.slice(5, 7)) - 1;
     const cell = map.get(record.category)?.[monthIndex];
@@ -128,7 +128,7 @@ export const getNetMonthTotals = (records: FinanceRecord[]) => {
   const totals = emptyMonthTotals();
   records.forEach(record => {
     const monthIndex = Number(record.date.slice(5, 7)) - 1;
-    totals[monthIndex][record.mode] += record.kind === "income" ? record.amount : -record.amount;
+    totals[monthIndex][record.mode] += record.type === "income" ? record.amount : -record.amount;
   });
   return totals;
 };

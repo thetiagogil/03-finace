@@ -2,7 +2,7 @@ import { Alert, Box, Button, Card, Container, Stack, TextField, Typography } fro
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { continueWithTestUser, login, signup } from "../services/authService";
-import { seedTestUserRecords } from "../services/financeService";
+import { seedTestUserRecords } from "../services/testDataService";
 
 export const LoginPage = () => {
   const navigate = useNavigate();

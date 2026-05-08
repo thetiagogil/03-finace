@@ -3,9 +3,9 @@ import { useMemo } from "react";
 import { Area, AreaChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { EmptyState } from "../components/EmptyState";
 import { useRecords } from "../services/financeService";
-import { getTrendSeries } from "../utils/financeCalculations";
-import { financeColors, getFinanceColor } from "../utils/financeColors";
-import { formatChartValue, formatCurrencyAxis } from "../utils/formatters";
+import { getTrendSeries } from "../lib/utils/financeCalculations";
+import { FINANCE_COLORS, getFinanceColor } from "../lib/utils/financeColors";
+import { formatChartValue, formatCurrencyAxis } from "../lib/utils/formatters";
 
 export const TrendsPage = () => {
   const records = useRecords();
@@ -30,16 +30,16 @@ export const TrendsPage = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={monthly}>
                   <defs>
-                    <linearGradient id="netTracked" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={financeColors.trackedIncome} stopOpacity={0.3} /><stop offset="100%" stopColor={financeColors.trackedIncome} stopOpacity={0} /></linearGradient>
-                    <linearGradient id="netPlanned" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={financeColors.plannedIncome} stopOpacity={0.25} /><stop offset="100%" stopColor={financeColors.plannedIncome} stopOpacity={0} /></linearGradient>
+                    <linearGradient id="netTracked" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={FINANCE_COLORS.trackedIncome} stopOpacity={0.3} /><stop offset="100%" stopColor={FINANCE_COLORS.trackedIncome} stopOpacity={0} /></linearGradient>
+                    <linearGradient id="netPlanned" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={FINANCE_COLORS.plannedIncome} stopOpacity={0.25} /><stop offset="100%" stopColor={FINANCE_COLORS.plannedIncome} stopOpacity={0} /></linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e7ef" vertical={false} />
                   <XAxis dataKey="label" stroke="#69758a" fontSize={12} />
                   <YAxis stroke="#69758a" fontSize={12} tickFormatter={formatCurrencyAxis} />
                   <Tooltip formatter={formatChartValue} />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Area type="monotone" dataKey="netTracked" stroke={financeColors.trackedIncome} fill="url(#netTracked)" strokeWidth={2} name="Tracked net" />
-                  <Area type="monotone" dataKey="netPlanned" stroke={financeColors.plannedIncome} fill="url(#netPlanned)" strokeDasharray="4 4" name="Planned net" />
+                  <Area type="monotone" dataKey="netTracked" stroke={FINANCE_COLORS.trackedIncome} fill="url(#netTracked)" strokeWidth={2} name="Tracked net" />
+                  <Area type="monotone" dataKey="netPlanned" stroke={FINANCE_COLORS.plannedIncome} fill="url(#netPlanned)" strokeDasharray="4 4" name="Planned net" />
                 </AreaChart>
               </ResponsiveContainer>
             </ChartCard>

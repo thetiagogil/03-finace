@@ -1,6 +1,6 @@
 import { Box, Card, Chip, LinearProgress, Stack, Typography } from "@mui/material";
-import { financeColors, getFinanceColor } from "../utils/financeColors";
-import { formatCurrency } from "../utils/formatters";
+import { FINANCE_COLORS, getFinanceColor } from "../lib/utils/financeColors";
+import { formatCurrency } from "../lib/utils/formatters";
 
 interface StatCardProps {
   label: string;
@@ -13,8 +13,8 @@ export const StatCard = ({ label, planned, tracked, tone = "neutral" }: StatCard
   const diff = tracked - planned;
   const diffGood = tone === "expense" ? diff <= 0 : diff >= 0;
   const percent = planned !== 0 ? (tracked / planned) * 100 : 0;
-  const trackedColor = tone === "income" ? getFinanceColor("income", "tracked") : tone === "expense" ? getFinanceColor("expense", "tracked") : tracked >= 0 ? financeColors.trackedIncome : financeColors.trackedExpense;
-  const plannedColor = tone === "income" ? getFinanceColor("income", "planned") : tone === "expense" ? getFinanceColor("expense", "planned") : planned >= 0 ? financeColors.plannedIncome : financeColors.plannedExpense;
+  const trackedColor = tone === "income" ? getFinanceColor("income", "tracked") : tone === "expense" ? getFinanceColor("expense", "tracked") : tracked >= 0 ? FINANCE_COLORS.trackedIncome : FINANCE_COLORS.trackedExpense;
+  const plannedColor = tone === "income" ? getFinanceColor("income", "planned") : tone === "expense" ? getFinanceColor("expense", "planned") : planned >= 0 ? FINANCE_COLORS.plannedIncome : FINANCE_COLORS.plannedExpense;
 
   return (
     <Card variant="outlined" sx={{ p: 2.5, borderRadius: 3 }}>
@@ -27,8 +27,8 @@ export const StatCard = ({ label, planned, tracked, tone = "neutral" }: StatCard
             size="small"
             label={`${diff >= 0 ? "+" : ""}${formatCurrency(diff)}`}
             sx={{
-              bgcolor: diffGood ? financeColors.trackedIncomeSoft : financeColors.trackedExpenseSoft,
-              color: diffGood ? financeColors.trackedIncome : financeColors.trackedExpense,
+              bgcolor: diffGood ? FINANCE_COLORS.trackedIncomeSoft : FINANCE_COLORS.trackedExpenseSoft,
+              color: diffGood ? FINANCE_COLORS.trackedIncome : FINANCE_COLORS.trackedExpense,
               fontWeight: 700
             }}
           />

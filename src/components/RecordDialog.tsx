@@ -1,21 +1,21 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { useMemo, useState, type ReactNode } from "react";
-import type { FinanceRecord, RecordKind, RecordMode } from "../models/finance";
+import type { FinanceRecord, RecordType, RecordMode } from "../types/financeRecord";
 import { addRecord, getCategories, updateRecord } from "../services/financeService";
-import { getFinanceColor, getFinanceSoftColor, getFinanceToggleSx, getModeColor, getModeSoftColor } from "../utils/financeColors";
+import { getFinanceColor, getFinanceSoftColor, getFinanceToggleSx, getModeColor, getModeSoftColor } from "../lib/utils/financeColors";
 
 interface RecordDialogProps {
   trigger: ReactNode;
-  defaultKind?: RecordKind;
+  defaultType?: RecordType;
   defaultMode?: RecordMode;
   initialRecord?: FinanceRecord;
 }
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-export const RecordDialog = ({ trigger, defaultKind = "income", defaultMode = "tracked", initialRecord }: RecordDialogProps) => {
+export const RecordDialog = ({ trigger, defaultType = "income", defaultMode = "tracked", initialRecord }: RecordDialogProps) => {
   const [open, setOpen] = useState(false);
-  const [kind, setKind] = useState<RecordKind>(defaultKind);
+  const [type, setType] = useState<RecordType>(defaultType);
   const [mode, setMode] = useState<RecordMode>(defaultMode);
   const [category, setCategory] = useState("");
   const [subcategory, setSubcategory] = useState("");
@@ -23,12 +23,12 @@ export const RecordDialog = ({ trigger, defaultKind = "income", defaultMode = "t
   const [date, setDate] = useState(today());
   const [description, setDescription] = useState("");
 
-  const categories = useMemo(() => getCategories(kind), [kind]);
+  const categories = useMemo(() => getCategories(type), [type]);
   const isValid = Boolean(category && amount && Number(amount) > 0 && date);
 
   const openDialog = () => {
     if (initialRecord) {
-      setKind(initialRecord.kind);
+      setType(initialRecord.type);
       setMode(initialRecord.mode);
       setCategory(initialRecord.category);
       setSubcategory(initialRecord.subcategory ?? "");
@@ -36,7 +36,7 @@ export const RecordDialog = ({ trigger, defaultKind = "income", defaultMode = "t
       setDate(initialRecord.date);
       setDescription(initialRecord.description ?? "");
     } else {
-      setKind(defaultKind);
+      setType(defaultType);
       setMode(defaultMode);
       setCategory("");
       setSubcategory("");
@@ -49,7 +49,7 @@ export const RecordDialog = ({ trigger, defaultKind = "income", defaultMode = "t
 
   const handleSubmit = () => {
     const payload = {
-      kind,
+      type,
       mode,
       category,
       subcategory: subcategory || undefined,
@@ -78,7 +78,7 @@ export const RecordDialog = ({ trigger, defaultKind = "income", defaultMode = "t
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
               <Stack spacing={1} flex={1}>
                 <Typography variant="body2" fontWeight={600}>Type</Typography>
-                <ToggleButtonGroup exclusive fullWidth value={kind} onChange={(_, value: RecordKind | null) => value && setKind(value)}>
+                <ToggleButtonGroup exclusive fullWidth value={type} onChange={(_, value: RecordType | null) => value && setType(value)}>
                   <ToggleButton value="income" sx={getFinanceToggleSx(getFinanceColor("income", "tracked"), getFinanceSoftColor("income", "tracked"))}>Income</ToggleButton>
                   <ToggleButton value="expense" sx={getFinanceToggleSx(getFinanceColor("expense", "tracked"), getFinanceSoftColor("expense", "tracked"))}>Expense</ToggleButton>
                 </ToggleButtonGroup>

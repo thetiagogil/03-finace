@@ -12,7 +12,7 @@ import type { SvgIconComponent } from "@mui/icons-material";
 import { useState, type ReactNode } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { logout, useAuth } from "../services/authService";
-import { capitalizeFirstLetter } from "../utils/text";
+import { capitalizeFirstLetter } from "../lib/utils/text";
 
 interface PageShellProps {
   children: ReactNode;

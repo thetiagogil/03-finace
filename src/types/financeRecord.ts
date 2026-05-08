@@ -1,4 +1,4 @@
-export type RecordKind = "income" | "expense";
+export type RecordType = "income" | "expense";
 
 export type RecordMode = "tracked" | "planned";
 
@@ -6,7 +6,7 @@ export type ModeFilter = "both" | RecordMode;
 
 export interface FinanceRecord {
   id: string;
-  kind: RecordKind;
+  type: RecordType;
   mode: RecordMode;
   category: string;
   subcategory?: string;
@@ -16,9 +16,4 @@ export interface FinanceRecord {
   createdAt: string;
 }
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  isTestUser?: boolean;
-}
+export type FinanceRecordInput = Omit<FinanceRecord, "id" | "createdAt">;

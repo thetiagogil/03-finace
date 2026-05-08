@@ -1,10 +1,9 @@
 import { useSyncExternalStore } from "react";
-import type { User } from "../models/finance";
-import { capitalizeFirstLetter } from "../utils/text";
-
-const usersKey = "finace.users.v1";
-const sessionKey = "finace.session.v1";
-export const testUserId = "finace-test-user";
+import { STORAGE_KEYS } from "../lib/constants/storageKeys";
+import { TEST_USER } from "../lib/constants/testUser";
+import { capitalizeFirstLetter } from "../lib/utils/text";
+import type { User } from "../types/user";
+import { readStorage, removeStorage, writeStorage } from "./storageService";
 
 interface StoredUser extends User {
   passwordHash: string;
@@ -16,17 +15,8 @@ const listeners = new Set<Listener>();
 
 const emit = () => listeners.forEach(listener => listener());
 
-const read = <T,>(key: string, fallback: T): T => {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
-};
-
 const write = (key: string, value: unknown) => {
-  localStorage.setItem(key, JSON.stringify(value));
+  writeStorage(key, value);
   emit();
 };
 
@@ -38,7 +28,7 @@ const hash = (value: string) => {
   return (result >>> 0).toString(36);
 };
 
-const getUsers = () => read<StoredUser[]>(usersKey, []);
+const getUsers = () => readStorage<StoredUser[]>(STORAGE_KEYS.users, []);
 
 const getPublicUser = (user: StoredUser): User => ({
   id: user.id,
@@ -49,21 +39,21 @@ const getPublicUser = (user: StoredUser): User => ({
 
 const ensureTestUser = () => {
   const users = getUsers();
-  const existingUser = users.find(user => user.id === testUserId);
+  const existingUser = users.find(user => user.id === TEST_USER.id);
   if (existingUser) return existingUser;
-  const testUser: StoredUser = {
-    id: testUserId,
-    name: "Test User",
-    email: "test@finace.local",
-    passwordHash: hash("test-user"),
-    isTestUser: true
+  const user: StoredUser = {
+    id: TEST_USER.id,
+    name: TEST_USER.name,
+    email: TEST_USER.email,
+    passwordHash: hash(TEST_USER.password),
+    isTestUser: TEST_USER.isTestUser
   };
-  write(usersKey, [...users, testUser]);
-  return testUser;
+  write(STORAGE_KEYS.users, [...users, user]);
+  return user;
 };
 
 export const getCurrentUser = (): User | null => {
-  const userId = read<string | null>(sessionKey, null);
+  const userId = readStorage<string | null>(STORAGE_KEYS.session, null);
   if (!userId) return null;
   const user = getUsers().find(item => item.id === userId);
   return user ? getPublicUser(user) : null;
@@ -82,8 +72,8 @@ export const signup = (input: { name: string; email: string; password: string })
     email,
     passwordHash: hash(input.password)
   };
-  write(usersKey, [...users, user]);
-  write(sessionKey, user.id);
+  write(STORAGE_KEYS.users, [...users, user]);
+  write(STORAGE_KEYS.session, user.id);
   return getPublicUser(user);
 };
 
@@ -91,18 +81,18 @@ export const login = (input: { email: string; password: string }) => {
   const email = input.email.trim().toLowerCase();
   const user = getUsers().find(item => item.email === email);
   if (!user || user.passwordHash !== hash(input.password)) throw new Error("Invalid email or password");
-  write(sessionKey, user.id);
+  write(STORAGE_KEYS.session, user.id);
   return getPublicUser(user);
 };
 
 export const continueWithTestUser = () => {
-  const testUser = ensureTestUser();
-  write(sessionKey, testUser.id);
-  return getPublicUser(testUser);
+  const user = ensureTestUser();
+  write(STORAGE_KEYS.session, user.id);
+  return getPublicUser(user);
 };
 
 export const logout = () => {
-  localStorage.removeItem(sessionKey);
+  removeStorage(STORAGE_KEYS.session);
   emit();
 };
 
@@ -117,7 +107,7 @@ const subscribe = (listener: Listener) => {
 };
 
 export const useAuth = () => {
-  const session = useSyncExternalStore(subscribe, () => localStorage.getItem(sessionKey) ?? "", () => "");
+  const session = useSyncExternalStore(subscribe, () => localStorage.getItem(STORAGE_KEYS.session) ?? "", () => "");
   void session;
   const user = getCurrentUser();
   return { user, isAuthenticated: Boolean(user) };

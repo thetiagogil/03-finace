@@ -1,5 +1,5 @@
 import { FormControl, InputLabel, MenuItem, Select, Stack } from "@mui/material";
-import { allMonths, monthLabels } from "../utils/period";
+import { ALL_MONTHS, MONTH_LABELS } from "../lib/utils/period";
 
 interface PeriodFilterProps {
   year: number;
@@ -24,8 +24,8 @@ export const PeriodFilter = ({ year, month, years, onChange }: PeriodFilterProps
       <FormControl size="small" sx={{ minWidth: 176 }}>
         <InputLabel>Month</InputLabel>
         <Select label="Month" value={month} onChange={event => onChange({ year, month: event.target.value })}>
-          <MenuItem value={allMonths}>Whole year</MenuItem>
-          {monthLabels.map((label, index) => {
+          <MenuItem value={ALL_MONTHS}>Whole year</MenuItem>
+          {MONTH_LABELS.map((label, index) => {
             const value = String(index + 1).padStart(2, "0");
             return (
               <MenuItem key={value} value={value}>
