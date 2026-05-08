@@ -40,7 +40,11 @@ import {
   getFinanceSoftColor,
 } from "../lib/utils/financeColors";
 import { formatCurrency } from "../lib/utils/formatters";
-import { ALL_MONTHS, getPeriodLabel, getYearOptions } from "../lib/utils/period";
+import {
+  ALL_MONTHS,
+  getPeriodLabel,
+  getYearOptions,
+} from "../lib/utils/period";
 
 export const RecordsPage = () => {
   const records = useRecords();

@@ -286,7 +286,11 @@ export const DashboardPage = () => {
                 value={String(monthRecords.length)}
               />
               <Callout
-                icon={<TrendingUpIcon sx={{ color: FINANCE_COLORS.trackedIncome }} />}
+                icon={
+                  <TrendingUpIcon
+                    sx={{ color: FINANCE_COLORS.trackedIncome }}
+                  />
+                }
                 label="Income vs. plan"
                 value={
                   incomePlan
@@ -295,7 +299,11 @@ export const DashboardPage = () => {
                 }
               />
               <Callout
-                icon={<TrendingDownIcon sx={{ color: FINANCE_COLORS.trackedExpense }} />}
+                icon={
+                  <TrendingDownIcon
+                    sx={{ color: FINANCE_COLORS.trackedExpense }}
+                  />
+                }
                 label="Spending vs. plan"
                 value={
                   expensePlan

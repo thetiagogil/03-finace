@@ -13,7 +13,7 @@ type Listener = () => void;
 
 const listeners = new Set<Listener>();
 
-const emit = () => listeners.forEach(listener => listener());
+const emit = () => listeners.forEach((listener) => listener());
 
 const write = (key: string, value: unknown) => {
   writeStorage(key, value);
@@ -34,19 +34,19 @@ const getPublicUser = (user: StoredUser): User => ({
   id: user.id,
   name: capitalizeFirstLetter(user.name),
   email: user.email,
-  isTestUser: user.isTestUser
+  isTestUser: user.isTestUser,
 });
 
 const ensureTestUser = () => {
   const users = getUsers();
-  const existingUser = users.find(user => user.id === TEST_USER.id);
+  const existingUser = users.find((user) => user.id === TEST_USER.id);
   if (existingUser) return existingUser;
   const user: StoredUser = {
     id: TEST_USER.id,
     name: TEST_USER.name,
     email: TEST_USER.email,
     passwordHash: hash(TEST_USER.password),
-    isTestUser: TEST_USER.isTestUser
+    isTestUser: TEST_USER.isTestUser,
   };
   write(STORAGE_KEYS.users, [...users, user]);
   return user;
@@ -55,22 +55,29 @@ const ensureTestUser = () => {
 export const getCurrentUser = (): User | null => {
   const userId = readStorage<string | null>(STORAGE_KEYS.session, null);
   if (!userId) return null;
-  const user = getUsers().find(item => item.id === userId);
+  const user = getUsers().find((item) => item.id === userId);
   return user ? getPublicUser(user) : null;
 };
 
-export const signup = (input: { name: string; email: string; password: string }) => {
+export const signup = (input: {
+  name: string;
+  email: string;
+  password: string;
+}) => {
   const email = input.email.trim().toLowerCase();
   const name = input.name.trim();
-  if (!name || !email || !input.password) throw new Error("All fields are required");
-  if (input.password.length < 6) throw new Error("Password must be at least 6 characters");
+  if (!name || !email || !input.password)
+    throw new Error("All fields are required");
+  if (input.password.length < 6)
+    throw new Error("Password must be at least 6 characters");
   const users = getUsers();
-  if (users.some(user => user.email === email)) throw new Error("An account with this email already exists");
+  if (users.some((user) => user.email === email))
+    throw new Error("An account with this email already exists");
   const user: StoredUser = {
     id: crypto.randomUUID(),
     name,
     email,
-    passwordHash: hash(input.password)
+    passwordHash: hash(input.password),
   };
   write(STORAGE_KEYS.users, [...users, user]);
   write(STORAGE_KEYS.session, user.id);
@@ -79,8 +86,9 @@ export const signup = (input: { name: string; email: string; password: string })
 
 export const login = (input: { email: string; password: string }) => {
   const email = input.email.trim().toLowerCase();
-  const user = getUsers().find(item => item.email === email);
-  if (!user || user.passwordHash !== hash(input.password)) throw new Error("Invalid email or password");
+  const user = getUsers().find((item) => item.email === email);
+  if (!user || user.passwordHash !== hash(input.password))
+    throw new Error("Invalid email or password");
   write(STORAGE_KEYS.session, user.id);
   return getPublicUser(user);
 };
@@ -107,7 +115,11 @@ const subscribe = (listener: Listener) => {
 };
 
 export const useAuth = () => {
-  const session = useSyncExternalStore(subscribe, () => localStorage.getItem(STORAGE_KEYS.session) ?? "", () => "");
+  const session = useSyncExternalStore(
+    subscribe,
+    () => localStorage.getItem(STORAGE_KEYS.session) ?? "",
+    () => "",
+  );
   void session;
   const user = getCurrentUser();
   return { user, isAuthenticated: Boolean(user) };

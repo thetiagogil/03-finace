@@ -2,11 +2,24 @@ import type { FinanceRecord } from "../../types/financeRecord";
 
 export const ALL_MONTHS = "all";
 
-export const MONTH_LABELS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+export const MONTH_LABELS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 export const getYearOptions = (records: FinanceRecord[]) => {
   const years = new Set<number>();
-  records.forEach(record => years.add(Number(record.date.slice(0, 4))));
+  records.forEach((record) => years.add(Number(record.date.slice(0, 4))));
   years.add(new Date().getFullYear());
   return Array.from(years).sort((a, b) => b - a);
 };

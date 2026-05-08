@@ -1,4 +1,11 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import { useState, type ReactNode } from "react";
 
 interface ConfirmActionProps {
@@ -9,7 +16,13 @@ interface ConfirmActionProps {
   children: ReactNode;
 }
 
-export const ConfirmAction = ({ title, description, confirmLabel, onConfirm, children }: ConfirmActionProps) => {
+export const ConfirmAction = ({
+  title,
+  description,
+  confirmLabel,
+  onConfirm,
+  children,
+}: ConfirmActionProps) => {
   const [open, setOpen] = useState(false);
 
   const handleConfirm = () => {
@@ -27,7 +40,9 @@ export const ConfirmAction = ({ title, description, confirmLabel, onConfirm, chi
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button color="error" variant="contained" onClick={handleConfirm}>{confirmLabel}</Button>
+          <Button color="error" variant="contained" onClick={handleConfirm}>
+            {confirmLabel}
+          </Button>
         </DialogActions>
       </Dialog>
     </>

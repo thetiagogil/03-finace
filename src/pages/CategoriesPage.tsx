@@ -116,7 +116,11 @@ export const CategoriesPage = () => {
                 Expense
               </ToggleButton>
             </ToggleButtonGroup>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ sm: "center" }}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1.5}
+              alignItems={{ sm: "center" }}
+            >
               <TextField
                 size="small"
                 label="Add a new category"

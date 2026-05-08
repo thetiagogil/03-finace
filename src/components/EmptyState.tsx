@@ -10,7 +10,13 @@ interface EmptyStateProps {
   variant?: "card" | "plain";
 }
 
-export const EmptyState = ({ title, description, action, compact = false, variant = "card" }: EmptyStateProps) => {
+export const EmptyState = ({
+  title,
+  description,
+  action,
+  compact = false,
+  variant = "card",
+}: EmptyStateProps) => {
   const content = (
     <Stack spacing={1.5} alignItems="center" sx={{ maxWidth: 480, mx: "auto" }}>
       <Box
@@ -23,7 +29,7 @@ export const EmptyState = ({ title, description, action, compact = false, varian
           border: "1px solid",
           borderColor: "divider",
           borderRadius: 2,
-          color: "primary.main"
+          color: "primary.main",
         }}
       >
         <InboxOutlinedIcon fontSize={compact ? "small" : "medium"} />
@@ -44,7 +50,7 @@ export const EmptyState = ({ title, description, action, compact = false, varian
     p: compact ? 3 : 4,
     borderRadius: 3,
     textAlign: "center",
-    bgcolor: "rgba(241,244,248,0.72)"
+    bgcolor: "rgba(241,244,248,0.72)",
   };
 
   if (variant === "plain") {

@@ -16,7 +16,11 @@ import {
 } from "@mui/material";
 import { useMemo, useState } from "react";
 import { EmptyState } from "../components/EmptyState";
-import type { FinanceRecord, ModeFilter, RecordType } from "../types/financeRecord";
+import type {
+  FinanceRecord,
+  ModeFilter,
+  RecordType,
+} from "../types/financeRecord";
 import { useRecords } from "../services/financeService";
 import {
   buildCategoryMonthPivot,

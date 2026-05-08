@@ -1,5 +1,10 @@
 import { CssBaseline, GlobalStyles, ThemeProvider } from "@mui/material";
-import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
 import { PageShell } from "./components/PageShell";
 import { ProtectedRoute, PublicOnlyRoute } from "./components/RouteGuard";
 import { CategoriesPage } from "./pages/CategoriesPage";
@@ -19,23 +24,80 @@ const App = () => {
       <GlobalStyles
         styles={{
           body: {
-            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(23,32,51,0.06) 1px, transparent 0)",
-            backgroundSize: "28px 28px"
-          }
+            backgroundImage:
+              "radial-gradient(circle at 1px 1px, rgba(23,32,51,0.06) 1px, transparent 0)",
+            backgroundSize: "28px 28px",
+          },
         }}
       />
       <Router>
         <PageShell>
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
-            <Route path="/signup" element={<PublicOnlyRoute><SignupPage /></PublicOnlyRoute>} />
-            <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-            <Route path="/records" element={<ProtectedRoute><RecordsPage /></ProtectedRoute>} />
-            <Route path="/ledger" element={<ProtectedRoute><LedgerPage /></ProtectedRoute>} />
-            <Route path="/compare" element={<ProtectedRoute><ComparePage /></ProtectedRoute>} />
-            <Route path="/trends" element={<ProtectedRoute><TrendsPage /></ProtectedRoute>} />
-            <Route path="/categories" element={<ProtectedRoute><CategoriesPage /></ProtectedRoute>} />
+            <Route
+              path="/login"
+              element={
+                <PublicOnlyRoute>
+                  <LoginPage />
+                </PublicOnlyRoute>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <PublicOnlyRoute>
+                  <SignupPage />
+                </PublicOnlyRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/records"
+              element={
+                <ProtectedRoute>
+                  <RecordsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ledger"
+              element={
+                <ProtectedRoute>
+                  <LedgerPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/compare"
+              element={
+                <ProtectedRoute>
+                  <ComparePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/trends"
+              element={
+                <ProtectedRoute>
+                  <TrendsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/categories"
+              element={
+                <ProtectedRoute>
+                  <CategoriesPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </PageShell>

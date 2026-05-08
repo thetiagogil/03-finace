@@ -160,7 +160,11 @@ export const LandingPage = () => {
               color={FINANCE_COLORS.trackedIncome}
               delta="+12% vs plan"
             />
-            <Tile label="Planned" value="€3,200" color={FINANCE_COLORS.plannedIncome} />
+            <Tile
+              label="Planned"
+              value="€3,200"
+              color={FINANCE_COLORS.plannedIncome}
+            />
           </Stack>
           <Stack spacing={2} sx={{ mt: 3 }}>
             {[
