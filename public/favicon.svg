@@ -1,6 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="FIN/ACE favicon">
-  <rect width="64" height="64" rx="14" fill="#243d73"/>
-  <path d="M18 18h28v7H26v8h17v7H26v16h-8V18Z" fill="#f8f9fb"/>
-  <path d="M41 42h11v6H41v-6Z" fill="#c44a36"/>
-  <path d="M41 52h15v6H41v-6Z" fill="#2f9d68"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Finace favicon concept">
+  <circle cx="32" cy="32" r="30" fill="#1a1d23"/>
+  <g id="mark" transform="translate(1 0)">
+    <g id="f-stem" transform="translate(0 0)">
+      <path d="M23 17v30" fill="none" stroke="#dbeafe" stroke-width="7" stroke-linecap="round"/>
+    </g>
+    <g id="f-top-bar" transform="translate(-1 -2)">
+      <path d="M24 19h21" fill="none" stroke="#2f9d68" stroke-width="7" stroke-linecap="round"/>
+    </g>
+    <g id="f-middle-bar" transform="translate(-1 0)">
+      <path d="M24 32h16" fill="none" stroke="#c44a36" stroke-width="7" stroke-linecap="round"/>
+    </g>
+  </g>
 </svg>
