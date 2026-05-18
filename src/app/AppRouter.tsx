@@ -18,10 +18,12 @@ import { LandingPage } from "../pages/landing/LandingPage";
 import { LedgerPage } from "../pages/ledger/LedgerPage";
 import { RecordsPage } from "../pages/records/RecordsPage";
 import { TrendsPage } from "../pages/trends/TrendsPage";
+import { ScrollToTop } from "./ScrollToTop";
 
 export const AppRouter = () => {
   return (
     <Router>
+      <ScrollToTop />
       <PageShell>
         <Routes>
           <Route path="/" element={<LandingPage />} />
