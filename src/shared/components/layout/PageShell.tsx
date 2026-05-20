@@ -9,7 +9,6 @@ import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import TableChartOutlinedIcon from "@mui/icons-material/TableChartOutlined";
 import {
   AppBar,
-  Avatar,
   Box,
   Button,
   Container,
@@ -96,17 +95,19 @@ export const PageShell = ({ children }: PageShellProps) => {
                 flexShrink: 0,
               }}
             >
-              <Avatar
-                variant="rounded"
+              <Box
+                component="img"
+                src="/favicon.svg"
+                alt=""
+                aria-hidden="true"
                 sx={{
                   width: 32,
                   height: 32,
-                  bgcolor: "primary.main",
-                  fontWeight: 700,
+                  borderRadius: "8px",
+                  display: "block",
+                  flexShrink: 0,
                 }}
-              >
-                F
-              </Avatar>
+              />
               <Box>
                 <Typography
                   variant="h6"
