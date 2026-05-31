@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { continueWithTestUser, login } from "../storage/auth-storage";
-import { seedTestUserRecords } from "../storage/test-data-storage";
+import { login } from "../storage/auth-storage";
+import { useTestUserSession } from "./useTestUserSession";
 
 export const useLoginForm = () => {
   const navigate = useNavigate();
+  const handleTestUser = useTestUserSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,17 +20,11 @@ export const useLoginForm = () => {
       navigate("/dashboard");
     } catch (caughtError) {
       setError(
-        caughtError instanceof Error ? caughtError.message : "Login failed",
+        caughtError instanceof Error ? caughtError.message : "Log in failed",
       );
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleTestUser = () => {
-    continueWithTestUser();
-    seedTestUserRecords();
-    navigate("/dashboard");
   };
 
   return {

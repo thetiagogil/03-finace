@@ -139,9 +139,9 @@ export const PageShell = ({ children }: PageShellProps) => {
             )}
             <Stack direction="row" spacing={1} sx={{ ml: "auto" }}>
               {isAuthenticated ? (
-                <Tooltip title="Logout">
+                <Tooltip title="Log out">
                   <IconButton
-                    aria-label="Logout"
+                    aria-label="Log out"
                     color="primary"
                     onClick={handleLogout}
                     sx={{
@@ -155,10 +155,10 @@ export const PageShell = ({ children }: PageShellProps) => {
               ) : (
                 <>
                   <Button component={Link} to="/login" variant="text">
-                    Sign in
+                    Log in
                   </Button>
                   <Button component={Link} to="/signup" variant="contained">
-                    Get started
+                    Sign up
                   </Button>
                 </>
               )}

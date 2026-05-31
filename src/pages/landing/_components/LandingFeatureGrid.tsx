@@ -8,17 +8,17 @@ const features = [
   {
     icon: <PlaylistAddIcon />,
     title: "Log both sides",
-    text: "Record what you planned and what actually happened. Income or expense, every entry has a mode.",
+    text: "Track both your planned and actual finances in one place, so you can see the full picture of your financial health.",
   },
   {
     icon: <CompareArrowsIcon />,
     title: "Compare any period",
-    text: "Filter by year, drill into any month, and see exactly where reality drifted from your intentions.",
+    text: "Side-by-side comparisons of any two months show you exactly where you went off-plan and where you nailed it.",
   },
   {
     icon: <ShowChartIcon />,
     title: "See your patterns",
-    text: "Trends across months reveal what consistently goes off-plan and what you have mastered.",
+    text: "Visualize your financial trends over time to understand your spending habits and make informed decisions for a healthier financial future.",
   },
 ];
 
@@ -35,7 +35,7 @@ export const LandingFeatureGrid = () => (
       How it works
     </Typography>
     <Typography variant="h3" sx={{ mt: 1, maxWidth: 650 }}>
-      Two perspectives. One clearer picture.
+      Two perspectives. One clear picture.
     </Typography>
     <Box
       sx={{

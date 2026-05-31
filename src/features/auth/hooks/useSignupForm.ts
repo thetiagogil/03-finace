@@ -1,9 +1,11 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { signup } from "../storage/auth-storage";
+import { useTestUserSession } from "./useTestUserSession";
 
 export const useSignupForm = () => {
   const navigate = useNavigate();
+  const handleTestUser = useTestUserSession();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +21,7 @@ export const useSignupForm = () => {
       navigate("/dashboard");
     } catch (caughtError) {
       setError(
-        caughtError instanceof Error ? caughtError.message : "Signup failed",
+        caughtError instanceof Error ? caughtError.message : "Sign up failed",
       );
     } finally {
       setLoading(false);
@@ -36,5 +38,6 @@ export const useSignupForm = () => {
     setEmail,
     setPassword,
     handleSubmit,
+    handleTestUser,
   };
 };

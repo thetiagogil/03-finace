@@ -7,16 +7,17 @@ export const SignupForm = () => {
 
   return (
     <AuthCard
-      eyebrow="Get started"
-      title="Create local profile"
+      eyebrow="Sign up"
+      title="Sign up"
       subtitle="New profiles start empty and store data only in this browser."
       onSubmit={form.handleSubmit}
       error={form.error}
       loading={form.loading}
-      button="Create profile"
+      button="Sign up"
       footerText="Already have an account?"
       footerLink="/login"
-      footerAction="Sign in"
+      footerAction="Log in"
+      testAction={form.handleTestUser}
       fields={
         <>
           <TextField

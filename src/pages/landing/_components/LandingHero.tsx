@@ -55,8 +55,8 @@ export const LandingHero = ({
         fontWeight: 400,
       }}
     >
-      FIN/ACE keeps your intentions and your reality side by side, so you can
-      finally see where the two diverge and do something about it.
+      Take control of your finances with our intuitive budgeting and tracking
+      app. Plan, track, and achieve your financial goals with ease.
     </Typography>
     <Stack
       direction="row"
@@ -84,12 +84,9 @@ export const LandingHero = ({
             variant="contained"
             endIcon={<ArrowForwardIcon />}
           >
-            Get started
+            Sign up
           </Button>
-          <Button component={Link} to="/login" size="large" variant="outlined">
-            Sign in
-          </Button>
-          <Button size="large" variant="text" onClick={onTestUser}>
+          <Button size="large" variant="outlined" onClick={onTestUser}>
             Test the app
           </Button>
         </>

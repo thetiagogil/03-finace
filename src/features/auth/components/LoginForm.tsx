@@ -8,15 +8,15 @@ export const LoginForm = () => {
   return (
     <AuthCard
       eyebrow="Welcome back"
-      title="Sign in"
+      title="Log in"
       subtitle="Use a local browser-only profile. No data is sent to a server."
       onSubmit={form.handleSubmit}
       error={form.error}
       loading={form.loading}
-      button="Sign in"
+      button="Log in"
       footerText="No account?"
       footerLink="/signup"
-      footerAction="Create one"
+      footerAction="Sign up"
       testAction={form.handleTestUser}
       fields={
         <>

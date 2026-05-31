@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   Container,
+  Divider,
   Stack,
   Typography,
 } from "@mui/material";
@@ -72,9 +73,20 @@ export const AuthCard = ({
             {loading ? "Please wait..." : button}
           </Button>
           {testAction && (
-            <Button type="button" variant="outlined" onClick={testAction}>
-              Continue with test user
-            </Button>
+            <>
+              <Divider
+                sx={{
+                  color: "text.secondary",
+                  fontSize: 12,
+                  letterSpacing: "0.2em",
+                }}
+              >
+                OR
+              </Divider>
+              <Button type="button" variant="outlined" onClick={testAction}>
+                Continue with test user
+              </Button>
+            </>
           )}
         </Stack>
         <Typography
