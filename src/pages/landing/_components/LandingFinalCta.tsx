@@ -22,7 +22,7 @@ export const LandingFinalCta = ({
       to={isAuthenticated ? "/dashboard" : undefined}
       onClick={isAuthenticated ? undefined : onTestUser}
     >
-      {isAuthenticated ? "Open dashboard" : "Continue with test user"}
+      {isAuthenticated ? "Open dashboard" : "Continue with demo account"}
     </Button>
   </Box>
 );

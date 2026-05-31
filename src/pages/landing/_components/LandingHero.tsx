@@ -87,7 +87,7 @@ export const LandingHero = ({
             Sign up
           </Button>
           <Button size="large" variant="outlined" onClick={onTestUser}>
-            Test the app
+            Try demo account
           </Button>
         </>
       )}

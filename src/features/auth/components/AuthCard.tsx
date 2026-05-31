@@ -84,7 +84,7 @@ export const AuthCard = ({
                 OR
               </Divider>
               <Button type="button" variant="outlined" onClick={testAction}>
-                Continue with test user
+                Continue with demo account
               </Button>
             </>
           )}
