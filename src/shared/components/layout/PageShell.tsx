@@ -1,4 +1,3 @@
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import CompareArrowsOutlinedIcon from "@mui/icons-material/CompareArrowsOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
@@ -12,13 +11,11 @@ import {
   Box,
   Button,
   Container,
-  Divider,
   Drawer,
   IconButton,
-  Menu,
-  MenuItem,
   Stack,
   Toolbar,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import type { SvgIconComponent } from "@mui/icons-material";
@@ -26,7 +23,6 @@ import { useState, type ReactNode } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../features/auth/hooks/useAuth";
 import { logout } from "../../../features/auth/storage/auth-storage";
-import { capitalizeFirstLetter } from "../../utils/text";
 
 interface PageShellProps {
   children: ReactNode;
@@ -48,15 +44,12 @@ const navItems: NavItem[] = [
 ];
 
 export const PageShell = ({ children }: PageShellProps) => {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
-  const displayName = user ? capitalizeFirstLetter(user.name) : "";
 
   const handleLogout = () => {
     logout();
-    setAnchor(null);
     navigate("/");
   };
 
@@ -145,40 +138,20 @@ export const PageShell = ({ children }: PageShellProps) => {
               </Stack>
             )}
             <Stack direction="row" spacing={1} sx={{ ml: "auto" }}>
-              {isAuthenticated && user ? (
-                <>
-                  <Button
-                    variant="outlined"
-                    startIcon={<AccountCircleOutlinedIcon />}
-                    onClick={(event) => setAnchor(event.currentTarget)}
+              {isAuthenticated ? (
+                <Tooltip title="Logout">
+                  <IconButton
+                    aria-label="Logout"
+                    color="primary"
+                    onClick={handleLogout}
+                    sx={{
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
                   >
-                    <Box
-                      component="span"
-                      sx={{ display: { xs: "none", sm: "inline" } }}
-                    >
-                      {displayName}
-                    </Box>
-                  </Button>
-                  <Menu
-                    anchorEl={anchor}
-                    open={Boolean(anchor)}
-                    onClose={() => setAnchor(null)}
-                  >
-                    <Box sx={{ px: 2, py: 1 }}>
-                      <Typography fontWeight={600}>{displayName}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {user.email}
-                      </Typography>
-                    </Box>
-                    <Divider />
-                    <MenuItem
-                      onClick={handleLogout}
-                      sx={{ color: "error.main", gap: 1 }}
-                    >
-                      <LogoutOutlinedIcon fontSize="small" /> Sign out
-                    </MenuItem>
-                  </Menu>
-                </>
+                    <LogoutOutlinedIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               ) : (
                 <>
                   <Button component={Link} to="/login" variant="text">
