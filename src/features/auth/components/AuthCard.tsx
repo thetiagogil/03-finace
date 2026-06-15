@@ -46,10 +46,21 @@ export const AuthCard = ({
         minHeight: "calc(100vh - 96px)",
         display: "flex",
         alignItems: "center",
-        px: 1,
+        boxSizing: "border-box",
+        width: "100%",
+        minWidth: 0,
+        px: { xs: 0, sm: 1 },
       }}
     >
-      <Card variant="outlined" sx={{ width: "100%", p: 4, borderRadius: 3 }}>
+      <Card
+        variant="outlined"
+        sx={{
+          width: "100%",
+          minWidth: 0,
+          p: { xs: 3, sm: 4 },
+          borderRadius: 3,
+        }}
+      >
         <Typography
           variant="caption"
           sx={{
@@ -63,7 +74,11 @@ export const AuthCard = ({
         <Typography variant="h4" sx={{ mt: 0.5 }}>
           {title}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ mt: 1, overflowWrap: "anywhere" }}
+        >
           {subtitle}
         </Typography>
         <Stack component="form" spacing={2} onSubmit={onSubmit} sx={{ mt: 3 }}>
@@ -76,6 +91,7 @@ export const AuthCard = ({
             <>
               <Divider
                 sx={{
+                  my: 0.5,
                   color: "text.secondary",
                   fontSize: 12,
                   letterSpacing: "0.2em",
@@ -83,7 +99,12 @@ export const AuthCard = ({
               >
                 OR
               </Divider>
-              <Button type="button" variant="outlined" onClick={testAction}>
+              <Button
+                type="button"
+                variant="outlined"
+                onClick={testAction}
+                disabled={loading}
+              >
                 Continue with demo account
               </Button>
             </>

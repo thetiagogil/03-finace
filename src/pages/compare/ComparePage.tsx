@@ -2,6 +2,7 @@ import { Container, Stack } from "@mui/material";
 import { CompareCategoryChart } from "../../features/finance/components/CompareCategoryChart";
 import { CompareCategoryTable } from "../../features/finance/components/CompareCategoryTable";
 import { CompareStats } from "../../features/finance/components/CompareStats";
+import { NewRecordButton } from "../../features/finance/components/NewRecordButton";
 import { formatCurrency } from "../../features/finance/lib/formatters";
 import { PageHeader } from "../../shared/components/layout/PageHeader";
 import { CompareHeaderControls } from "./_components/CompareHeaderControls";
@@ -34,12 +35,29 @@ export const ComparePage = () => {
           riskCount={page.riskCount}
           riskLabel={page.riskLabel}
           formatValue={formatCurrency}
+          largestVarianceCategory={page.largestVariance?.category}
+          largestVarianceValue={
+            page.largestVariance
+              ? Math.abs(page.largestVariance.diff)
+              : undefined
+          }
+          largestVarianceColor={
+            page.largestVariance &&
+            (page.type === "expense"
+              ? page.largestVariance.diff > 0
+              : page.largestVariance.diff < 0)
+              ? "error.main"
+              : "text.primary"
+          }
         />
         <CompareCategoryChart
           rows={page.rows}
           type={page.type}
           emptyTitle={page.emptyTitle}
           emptyDescription={page.emptyDescription}
+          emptyAction={
+            <NewRecordButton label="Add record" defaultType={page.type} />
+          }
         />
         <CompareCategoryTable
           rows={page.rows}

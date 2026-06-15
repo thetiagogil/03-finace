@@ -49,6 +49,7 @@ export const DashboardPage = () => {
           <EmptyState
             title="No finance records yet"
             description="Create your first planned or tracked record to unlock dashboard totals, charts, and monthly comparisons."
+            action={<NewRecordButton label="Create first record" />}
           />
         )}
       </Stack>

@@ -21,8 +21,12 @@ export const PeriodFilter = ({
   onChange,
 }: PeriodFilterProps) => {
   return (
-    <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
-      <FormControl size="small" sx={{ minWidth: 132 }}>
+    <Stack
+      direction={{ xs: "column", sm: "row" }}
+      spacing={1.5}
+      sx={{ width: "100%" }}
+    >
+      <FormControl size="small" sx={{ width: { xs: "100%", sm: 132 } }}>
         <InputLabel>Year</InputLabel>
         <Select
           label="Year"
@@ -38,7 +42,7 @@ export const PeriodFilter = ({
           ))}
         </Select>
       </FormControl>
-      <FormControl size="small" sx={{ minWidth: 176 }}>
+      <FormControl size="small" sx={{ width: { xs: "100%", sm: 176 } }}>
         <InputLabel>Month</InputLabel>
         <Select
           label="Month"

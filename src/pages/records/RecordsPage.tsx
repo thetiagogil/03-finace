@@ -30,6 +30,8 @@ export const RecordsPage = () => {
           onModeChange={page.setMode}
           onTypeChange={page.setType}
           onSearchChange={page.setSearch}
+          hasActiveFilters={page.hasActiveFilters}
+          onClearFilters={page.clearFilters}
         >
           <RecordsTable
             records={page.filteredRecords}

@@ -5,15 +5,28 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Tooltip,
 } from "@mui/material";
-import { useState, type ReactNode } from "react";
+import {
+  cloneElement,
+  useState,
+  type MouseEvent,
+  type MouseEventHandler,
+  type ReactElement,
+} from "react";
+
+interface ConfirmActionTriggerProps {
+  onClick?: MouseEventHandler<HTMLElement>;
+  "aria-haspopup"?: "dialog";
+}
 
 interface ConfirmActionProps {
   title: string;
   description: string;
   confirmLabel: string;
   onConfirm: () => void;
-  children: ReactNode;
+  children: ReactElement<ConfirmActionTriggerProps>;
+  tooltip?: string;
 }
 
 export const ConfirmAction = ({
@@ -22,6 +35,7 @@ export const ConfirmAction = ({
   confirmLabel,
   onConfirm,
   children,
+  tooltip,
 }: ConfirmActionProps) => {
   const [open, setOpen] = useState(false);
 
@@ -30,9 +44,19 @@ export const ConfirmAction = ({
     setOpen(false);
   };
 
+  const handleTriggerClick = (event: MouseEvent<HTMLElement>) => {
+    children.props.onClick?.(event);
+    setOpen(true);
+  };
+
+  const trigger = cloneElement(children, {
+    onClick: handleTriggerClick,
+    "aria-haspopup": "dialog",
+  });
+
   return (
     <>
-      <span onClick={() => setOpen(true)}>{children}</span>
+      {tooltip ? <Tooltip title={tooltip}>{trigger}</Tooltip> : trigger}
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>

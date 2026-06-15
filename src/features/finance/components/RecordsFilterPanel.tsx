@@ -1,5 +1,7 @@
-﻿import SearchIcon from "@mui/icons-material/Search";
+import FilterAltOffOutlinedIcon from "@mui/icons-material/FilterAltOffOutlined";
+import SearchIcon from "@mui/icons-material/Search";
 import {
+  Button,
   Card,
   FormControl,
   InputAdornment,
@@ -24,6 +26,8 @@ interface RecordsFilterPanelProps {
   onModeChange: (mode: ModeFilter) => void;
   onTypeChange: (type: "all" | RecordType) => void;
   onSearchChange: (search: string) => void;
+  hasActiveFilters: boolean;
+  onClearFilters: () => void;
   children: ReactNode;
 }
 
@@ -38,6 +42,8 @@ export const RecordsFilterPanel = ({
   onModeChange,
   onTypeChange,
   onSearchChange,
+  hasActiveFilters,
+  onClearFilters,
   children,
 }: RecordsFilterPanelProps) => (
   <Card variant="outlined" sx={{ borderRadius: 3, overflow: "hidden" }}>
@@ -56,7 +62,7 @@ export const RecordsFilterPanel = ({
           years={years}
           onChange={onPeriodChange}
         />
-        <FormControl size="small" sx={{ minWidth: 190 }}>
+        <FormControl size="small" sx={{ width: { xs: "100%", sm: 190 } }}>
           <InputLabel>Mode</InputLabel>
           <Select
             label="Mode"
@@ -68,7 +74,7 @@ export const RecordsFilterPanel = ({
             <MenuItem value="both">Tracked & Planned</MenuItem>
           </Select>
         </FormControl>
-        <FormControl size="small" sx={{ minWidth: 150 }}>
+        <FormControl size="small" sx={{ width: { xs: "100%", sm: 150 } }}>
           <InputLabel>Type</InputLabel>
           <Select
             label="Type"
@@ -83,19 +89,32 @@ export const RecordsFilterPanel = ({
           </Select>
         </FormControl>
       </Stack>
-      <TextField
-        size="small"
-        value={search}
-        onChange={(event) => onSearchChange(event.target.value)}
-        placeholder="Search category or description"
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          ),
-        }}
-      />
+      <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+        <TextField
+          size="small"
+          value={search}
+          onChange={(event) => onSearchChange(event.target.value)}
+          placeholder="Search category, subcategory, or description"
+          sx={{ flex: 1 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <Button
+          type="button"
+          variant="outlined"
+          startIcon={<FilterAltOffOutlinedIcon />}
+          onClick={onClearFilters}
+          disabled={!hasActiveFilters}
+          sx={{ flexShrink: 0, alignSelf: { sm: "stretch" } }}
+        >
+          Clear filters
+        </Button>
+      </Stack>
     </Stack>
     {children}
   </Card>

@@ -1,4 +1,4 @@
-﻿import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import {
   Box,
@@ -14,10 +14,10 @@ import {
 } from "@mui/material";
 import { ConfirmAction } from "../../../shared/components/ui/ConfirmAction";
 import { EmptyState } from "../../../shared/components/ui/EmptyState";
-import { deleteRecord } from "../storage/finance-storage";
-import type { FinanceRecord } from "../types";
 import { getFinanceColor, getFinanceSoftColor } from "../lib/colors";
 import { formatCurrency } from "../lib/formatters";
+import { deleteRecord } from "../storage/finance-storage";
+import type { FinanceRecord } from "../types";
 import { RecordDialog } from "./RecordDialog";
 
 interface RecordsTableProps {
@@ -125,8 +125,12 @@ export const RecordsTable = ({
                 <Stack direction="row" justifyContent="flex-end" spacing={0.5}>
                   <RecordDialog
                     initialRecord={record}
+                    triggerTooltip="Edit record"
                     trigger={
-                      <IconButton size="small">
+                      <IconButton
+                        size="small"
+                        aria-label={`Edit ${record.category} record`}
+                      >
                         <EditOutlinedIcon fontSize="small" />
                       </IconButton>
                     }
@@ -136,8 +140,13 @@ export const RecordsTable = ({
                     description="This record will be permanently removed from your local data."
                     confirmLabel="Delete"
                     onConfirm={() => deleteRecord(record.id)}
+                    tooltip="Delete record"
                   >
-                    <IconButton size="small" color="error">
+                    <IconButton
+                      size="small"
+                      color="error"
+                      aria-label={`Delete ${record.category} record`}
+                    >
                       <DeleteOutlineIcon fontSize="small" />
                     </IconButton>
                   </ConfirmAction>

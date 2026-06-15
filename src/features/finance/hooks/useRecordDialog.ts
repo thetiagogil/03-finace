@@ -14,13 +14,19 @@ interface UseRecordDialogInput {
 
 const today = () => new Date().toISOString().slice(0, 10);
 
+const isValidDate = (value: string) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00`);
+  return !Number.isNaN(parsed.getTime());
+};
+
 export const useRecordDialog = ({
   defaultType,
   defaultMode,
   initialRecord,
 }: UseRecordDialogInput) => {
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState<RecordType>(defaultType);
+  const [type, setTypeState] = useState<RecordType>(defaultType);
   const [mode, setMode] = useState<RecordMode>(defaultMode);
   const [category, setCategory] = useState("");
   const [subcategory, setSubcategory] = useState("");
@@ -29,11 +35,22 @@ export const useRecordDialog = ({
   const [description, setDescription] = useState("");
 
   const categories = useMemo(() => getCategories(type), [type]);
-  const isValid = Boolean(category && amount && Number(amount) > 0 && date);
+  const numericAmount = Number(amount);
+  const amountIsValid = Number.isFinite(numericAmount) && numericAmount > 0;
+  const dateIsValid = isValidDate(date);
+  const categoryIsValid = categories.includes(category);
+  const isValid = amountIsValid && dateIsValid && categoryIsValid;
+
+  const setType = (nextType: RecordType) => {
+    setTypeState(nextType);
+    setCategory((currentCategory) =>
+      getCategories(nextType).includes(currentCategory) ? currentCategory : "",
+    );
+  };
 
   const openDialog = () => {
     if (initialRecord) {
-      setType(initialRecord.type);
+      setTypeState(initialRecord.type);
       setMode(initialRecord.mode);
       setCategory(initialRecord.category);
       setSubcategory(initialRecord.subcategory ?? "");
@@ -41,7 +58,7 @@ export const useRecordDialog = ({
       setDate(initialRecord.date);
       setDescription(initialRecord.description ?? "");
     } else {
-      setType(defaultType);
+      setTypeState(defaultType);
       setMode(defaultMode);
       setCategory("");
       setSubcategory("");
@@ -53,12 +70,14 @@ export const useRecordDialog = ({
   };
 
   const handleSubmit = () => {
+    if (!isValid) return;
+
     const payload = {
       type,
       mode,
       category,
       subcategory: subcategory || undefined,
-      amount: Number(amount),
+      amount: numericAmount,
       date,
       description: description || undefined,
     };
@@ -83,6 +102,9 @@ export const useRecordDialog = ({
     description,
     categories,
     isValid,
+    amountIsValid,
+    dateIsValid,
+    categoryIsValid,
     setOpen,
     setType,
     setMode,

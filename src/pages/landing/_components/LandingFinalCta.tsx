@@ -1,4 +1,5 @@
-import { Box, Button, Typography } from "@mui/material";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 
 interface LandingFinalCtaProps {
@@ -14,15 +15,38 @@ export const LandingFinalCta = ({
     <Typography variant="h2" sx={{ maxWidth: 680, mx: "auto" }}>
       Stop guessing. Start comparing.
     </Typography>
-    <Button
-      size="large"
-      variant="contained"
+    <Stack
+      direction={{ xs: "column", sm: "row" }}
+      spacing={1.5}
+      justifyContent="center"
       sx={{ mt: 4 }}
-      component={isAuthenticated ? Link : "button"}
-      to={isAuthenticated ? "/dashboard" : undefined}
-      onClick={isAuthenticated ? undefined : onTestUser}
     >
-      {isAuthenticated ? "Open dashboard" : "Continue with demo account"}
-    </Button>
+      {isAuthenticated ? (
+        <Button
+          size="large"
+          variant="contained"
+          component={Link}
+          to="/dashboard"
+          endIcon={<ArrowForwardIcon />}
+        >
+          Open dashboard
+        </Button>
+      ) : (
+        <>
+          <Button
+            size="large"
+            variant="contained"
+            component={Link}
+            to="/signup"
+            endIcon={<ArrowForwardIcon />}
+          >
+            Sign up
+          </Button>
+          <Button size="large" variant="outlined" onClick={onTestUser}>
+            Try demo account
+          </Button>
+        </>
+      )}
+    </Stack>
   </Box>
 );

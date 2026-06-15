@@ -1,5 +1,6 @@
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Box, Button, Card, Stack, Typography } from "@mui/material";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   Bar,
@@ -25,11 +26,19 @@ export const MonthlyNetChart = ({
   records,
   currentDate,
 }: MonthlyNetChartProps) => {
-  const monthly = getMonthlyNetSeries(records, currentDate);
+  const monthly = useMemo(
+    () => getMonthlyNetSeries(records, currentDate),
+    [currentDate, records],
+  );
 
   return (
-    <Card variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
-      <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
+    <Card variant="outlined" sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3 }}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        spacing={1}
+        sx={{ mb: 3 }}
+      >
         <Box>
           <Typography variant="h6" fontWeight={700}>
             Net by month
@@ -47,8 +56,13 @@ export const MonthlyNetChart = ({
           Trends
         </Button>
       </Stack>
-      <Box sx={{ height: 300 }}>
-        <ResponsiveContainer width="100%" height="100%">
+      <Box sx={{ height: { xs: 260, sm: 300 }, minWidth: 0 }}>
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          minWidth={1}
+          minHeight={1}
+        >
           <BarChart data={monthly} barCategoryGap={20}>
             <CartesianGrid
               strokeDasharray="3 3"

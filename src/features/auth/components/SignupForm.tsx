@@ -22,6 +22,8 @@ export const SignupForm = () => {
         <>
           <TextField
             label="Name"
+            autoComplete="name"
+            fullWidth
             required
             value={form.name}
             onChange={(event) => form.setName(event.target.value)}
@@ -29,6 +31,8 @@ export const SignupForm = () => {
           <TextField
             label="Email"
             type="email"
+            autoComplete="email"
+            fullWidth
             required
             value={form.email}
             onChange={(event) => form.setEmail(event.target.value)}
@@ -36,6 +40,8 @@ export const SignupForm = () => {
           <TextField
             label="Password"
             type="password"
+            autoComplete="new-password"
+            fullWidth
             required
             helperText="At least 6 characters."
             value={form.password}

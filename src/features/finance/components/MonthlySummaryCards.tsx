@@ -1,5 +1,6 @@
 ﻿import { Box } from "@mui/material";
 import { getPlanTrackTotals, getRecordsForMonth } from "../lib/calculations";
+import { useMemo } from "react";
 import type { FinanceRecord } from "../types";
 import { StatCard } from "./StatCard";
 
@@ -12,8 +13,14 @@ export const MonthlySummaryCards = ({
   records,
   currentDate,
 }: MonthlySummaryCardsProps) => {
-  const monthRecords = getRecordsForMonth(records, currentDate);
-  const totals = getPlanTrackTotals(monthRecords);
+  const monthRecords = useMemo(
+    () => getRecordsForMonth(records, currentDate),
+    [currentDate, records],
+  );
+  const totals = useMemo(
+    () => getPlanTrackTotals(monthRecords),
+    [monthRecords],
+  );
 
   return (
     <Box

@@ -23,6 +23,8 @@ export const LoginForm = () => {
           <TextField
             label="Email"
             type="email"
+            autoComplete="email"
+            fullWidth
             required
             value={form.email}
             onChange={(event) => form.setEmail(event.target.value)}
@@ -30,6 +32,8 @@ export const LoginForm = () => {
           <TextField
             label="Password"
             type="password"
+            autoComplete="current-password"
+            fullWidth
             required
             value={form.password}
             onChange={(event) => form.setPassword(event.target.value)}

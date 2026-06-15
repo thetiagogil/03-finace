@@ -1,5 +1,6 @@
 ﻿import AddIcon from "@mui/icons-material/Add";
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -7,16 +8,15 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
-  Typography,
 } from "@mui/material";
 import { EmptyState } from "../../../shared/components/ui/EmptyState";
+import { CategoryCard } from "./CategoryCard";
 import { useCategoryManager } from "../hooks/useCategoryManager";
 import {
   getFinanceColor,
   getFinanceSoftColor,
   getFinanceToggleSx,
 } from "../lib/colors";
-import { formatCurrency } from "../lib/formatters";
 import type { FinanceRecord, RecordType } from "../types";
 
 interface CategoryManagerProps {
@@ -81,11 +81,17 @@ export const CategoryManager = ({ records }: CategoryManagerProps) => {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={manager.handleAdd}
+              disabled={!manager.canAddCategory}
               sx={{ minHeight: 40, px: 2.5 }}
             >
               Add
             </Button>
           </Stack>
+          {manager.feedback ? (
+            <Alert severity={manager.feedback.type}>
+              {manager.feedback.message}
+            </Alert>
+          ) : null}
         </Stack>
       </Card>
 
@@ -114,36 +120,22 @@ export const CategoryManager = ({ records }: CategoryManagerProps) => {
             total: 0,
           };
           return (
-            <Card
+            <CategoryCard
               key={category}
-              variant="outlined"
-              sx={{ p: 2.5, borderRadius: 3 }}
-            >
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Typography fontWeight={700}>{category}</Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ textTransform: "uppercase", letterSpacing: "0.12em" }}
-                >
-                  {itemUsage.count} records
-                </Typography>
-              </Stack>
-              <Typography
-                variant="h4"
-                sx={{
-                  mt: 1,
-                  color: getFinanceColor(manager.type, "tracked"),
-                  fontWeight: 700,
-                }}
-              >
-                {formatCurrency(itemUsage.total)}
-              </Typography>
-            </Card>
+              category={category}
+              type={manager.type}
+              recordCount={itemUsage.count}
+              total={itemUsage.total}
+              isDefault={manager.isDefaultCategory(category)}
+              isEditing={manager.editingCategory === category}
+              editName={manager.editName}
+              canSaveEdit={manager.canSaveEdit(category)}
+              onBeginEdit={() => manager.beginEdit(category)}
+              onEditNameChange={manager.setEditName}
+              onSaveEdit={() => manager.handleRename(category)}
+              onCancelEdit={manager.cancelEdit}
+              onRemove={() => manager.handleRemove(category)}
+            />
           );
         })}
       </Box>

@@ -67,7 +67,10 @@ export const PageShell = ({ children }: PageShellProps) => {
         }}
       >
         <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ gap: 2, py: 1 }}>
+          <Toolbar
+            disableGutters
+            sx={{ gap: { xs: 1, sm: 2 }, minWidth: 0, py: 1 }}
+          >
             {isAuthenticated && (
               <IconButton
                 sx={{ display: { xs: "inline-flex", md: "none" } }}
@@ -85,7 +88,8 @@ export const PageShell = ({ children }: PageShellProps) => {
               sx={{
                 color: "text.primary",
                 textDecoration: "none",
-                flexShrink: 0,
+                minWidth: 0,
+                flexShrink: 1,
               }}
             >
               <Box
@@ -101,7 +105,7 @@ export const PageShell = ({ children }: PageShellProps) => {
                   flexShrink: 0,
                 }}
               />
-              <Box>
+              <Box sx={{ minWidth: 0 }}>
                 <Typography
                   variant="h6"
                   sx={{
@@ -137,7 +141,11 @@ export const PageShell = ({ children }: PageShellProps) => {
                 ))}
               </Stack>
             )}
-            <Stack direction="row" spacing={1} sx={{ ml: "auto" }}>
+            <Stack
+              direction="row"
+              spacing={{ xs: 0.5, sm: 1 }}
+              sx={{ ml: "auto", flexShrink: 0 }}
+            >
               {isAuthenticated ? (
                 <Tooltip title="Log out">
                   <IconButton
@@ -154,10 +162,20 @@ export const PageShell = ({ children }: PageShellProps) => {
                 </Tooltip>
               ) : (
                 <>
-                  <Button component={Link} to="/login" variant="text">
+                  <Button
+                    component={Link}
+                    to="/login"
+                    variant="text"
+                    sx={{ px: { xs: 1, sm: 1.5 } }}
+                  >
                     Log in
                   </Button>
-                  <Button component={Link} to="/signup" variant="contained">
+                  <Button
+                    component={Link}
+                    to="/signup"
+                    variant="contained"
+                    sx={{ px: { xs: 1.25, sm: 2 } }}
+                  >
                     Sign up
                   </Button>
                 </>

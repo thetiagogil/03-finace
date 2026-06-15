@@ -33,6 +33,7 @@ export const useComparePage = () => {
     month,
     type,
     rows,
+    largestVariance: rows[0] ?? null,
     totals,
     periodLabel: getPeriodLabel(year, month),
     riskCount:

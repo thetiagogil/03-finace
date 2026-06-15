@@ -25,14 +25,18 @@ export const CompareHeaderControls = ({
   onPeriodChange,
   onTypeChange,
 }: CompareHeaderControlsProps) => (
-  <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+  <Stack
+    direction={{ xs: "column", sm: "row" }}
+    spacing={1.5}
+    sx={{ width: "100%" }}
+  >
     <PeriodFilter
       year={year}
       month={month}
       years={years}
       onChange={onPeriodChange}
     />
-    <FormControl size="small" sx={{ minWidth: 140 }}>
+    <FormControl size="small" sx={{ width: { xs: "100%", sm: 140 } }}>
       <InputLabel>Type</InputLabel>
       <Select
         label="Type"

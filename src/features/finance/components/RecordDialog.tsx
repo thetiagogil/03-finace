@@ -12,9 +12,15 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import type { ReactNode } from "react";
+import {
+  cloneElement,
+  type MouseEvent,
+  type MouseEventHandler,
+  type ReactElement,
+} from "react";
 import { useRecordDialog } from "../hooks/useRecordDialog";
 import {
   getFinanceColor,
@@ -25,11 +31,17 @@ import {
 } from "../lib/colors";
 import type { FinanceRecord, RecordMode, RecordType } from "../types";
 
+interface RecordDialogTriggerProps {
+  onClick?: MouseEventHandler<HTMLElement>;
+  "aria-haspopup"?: "dialog";
+}
+
 interface RecordDialogProps {
-  trigger: ReactNode;
+  trigger: ReactElement<RecordDialogTriggerProps>;
   defaultType?: RecordType;
   defaultMode?: RecordMode;
   initialRecord?: FinanceRecord;
+  triggerTooltip?: string;
 }
 
 export const RecordDialog = ({
@@ -37,23 +49,37 @@ export const RecordDialog = ({
   defaultType = "income",
   defaultMode = "tracked",
   initialRecord,
+  triggerTooltip,
 }: RecordDialogProps) => {
   const dialog = useRecordDialog({ defaultType, defaultMode, initialRecord });
+  const handleTriggerClick = (event: MouseEvent<HTMLElement>) => {
+    trigger.props.onClick?.(event);
+    dialog.openDialog();
+  };
+
+  const triggerElement = cloneElement(trigger, {
+    onClick: handleTriggerClick,
+    "aria-haspopup": "dialog",
+  });
 
   return (
     <>
-      <span onClick={dialog.openDialog}>{trigger}</span>
+      {triggerTooltip ? (
+        <Tooltip title={triggerTooltip}>{triggerElement}</Tooltip>
+      ) : (
+        triggerElement
+      )}
       <Dialog
         open={dialog.open}
         onClose={() => dialog.setOpen(false)}
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle sx={{ pb: 0 }}>
-          <Typography variant="h5" fontWeight={700}>
+        <DialogTitle component="div" sx={{ pb: 0 }}>
+          <Typography variant="h5" component="h2" fontWeight={700}>
             {initialRecord ? "Edit record" : "New record"}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" component="p" color="text.secondary">
             Capture income or expenses, planned or actual.
           </Typography>
         </DialogTitle>
@@ -132,6 +158,7 @@ export const RecordDialog = ({
                   label="Category"
                   value={dialog.category}
                   onChange={(event) => dialog.setCategory(event.target.value)}
+                  error={Boolean(dialog.category) && !dialog.categoryIsValid}
                 >
                   {dialog.categories.map((item) => (
                     <MenuItem key={item} value={item}>
@@ -153,6 +180,13 @@ export const RecordDialog = ({
                 type="number"
                 value={dialog.amount}
                 onChange={(event) => dialog.setAmount(event.target.value)}
+                error={Boolean(dialog.amount) && !dialog.amountIsValid}
+                helperText={
+                  Boolean(dialog.amount) && !dialog.amountIsValid
+                    ? "Enter a positive amount."
+                    : " "
+                }
+                inputProps={{ min: 0.01, step: 0.01 }}
                 fullWidth
               />
               <TextField
@@ -160,6 +194,12 @@ export const RecordDialog = ({
                 type="date"
                 value={dialog.date}
                 onChange={(event) => dialog.setDate(event.target.value)}
+                error={Boolean(dialog.date) && !dialog.dateIsValid}
+                helperText={
+                  Boolean(dialog.date) && !dialog.dateIsValid
+                    ? "Enter a valid date."
+                    : " "
+                }
                 fullWidth
                 InputLabelProps={{ shrink: true }}
               />

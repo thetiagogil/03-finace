@@ -22,8 +22,12 @@ export const LedgerHeaderControls = ({
   onYearChange,
   onModeChange,
 }: LedgerHeaderControlsProps) => (
-  <Stack direction="row" spacing={1.5}>
-    <FormControl size="small" sx={{ minWidth: 130 }}>
+  <Stack
+    direction={{ xs: "column", sm: "row" }}
+    spacing={1.5}
+    sx={{ width: "100%" }}
+  >
+    <FormControl size="small" sx={{ width: { xs: "100%", sm: 130 } }}>
       <InputLabel>Year</InputLabel>
       <Select
         label="Year"
@@ -37,7 +41,7 @@ export const LedgerHeaderControls = ({
         ))}
       </Select>
     </FormControl>
-    <FormControl size="small" sx={{ minWidth: 190 }}>
+    <FormControl size="small" sx={{ width: { xs: "100%", sm: 190 } }}>
       <InputLabel>Mode</InputLabel>
       <Select
         label="Mode"

@@ -54,6 +54,10 @@ export const PageHeader = ({
         </Typography>
       ) : null}
     </Box>
-    {actions ? <Box sx={{ flexShrink: 0 }}>{actions}</Box> : null}
+    {actions ? (
+      <Box sx={{ flexShrink: 0, width: { xs: "100%", md: "auto" } }}>
+        {actions}
+      </Box>
+    ) : null}
   </Stack>
 );

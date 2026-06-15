@@ -10,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 import { EmptyState } from "../../../shared/components/ui/EmptyState";
+import type { ReactNode } from "react";
 import type { CompareRow } from "../lib/calculations";
 import { getFinanceColor } from "../lib/colors";
 import { formatChartValue, formatCurrencyAxis } from "../lib/formatters";
@@ -20,6 +21,7 @@ interface CompareCategoryChartProps {
   type: RecordType;
   emptyTitle: string;
   emptyDescription: string;
+  emptyAction?: ReactNode;
 }
 
 export const CompareCategoryChart = ({
@@ -27,8 +29,9 @@ export const CompareCategoryChart = ({
   type,
   emptyTitle,
   emptyDescription,
+  emptyAction,
 }: CompareCategoryChartProps) => (
-  <Card variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
+  <Card variant="outlined" sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3 }}>
     <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
       By category
     </Typography>
@@ -36,12 +39,18 @@ export const CompareCategoryChart = ({
       <EmptyState
         title={emptyTitle}
         description={emptyDescription}
+        action={emptyAction}
         compact
         variant="plain"
       />
     ) : (
-      <Box sx={{ height: 360 }}>
-        <ResponsiveContainer width="100%" height="100%">
+      <Box sx={{ height: { xs: 320, sm: 360 }, minWidth: 0 }}>
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          minWidth={1}
+          minHeight={1}
+        >
           <BarChart data={rows} layout="vertical" margin={{ left: 20 }}>
             <CartesianGrid
               strokeDasharray="3 3"

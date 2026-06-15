@@ -2,7 +2,7 @@ import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import WalletOutlinedIcon from "@mui/icons-material/WalletOutlined";
 import { Box, Card, Stack, Typography } from "@mui/material";
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { getPlanTrackTotals, getRecordsForMonth } from "../lib/calculations";
 import { FINANCE_COLORS } from "../lib/colors";
 import type { FinanceRecord } from "../types";
@@ -16,8 +16,14 @@ export const DashboardCallouts = ({
   records,
   currentDate,
 }: DashboardCalloutsProps) => {
-  const monthRecords = getRecordsForMonth(records, currentDate);
-  const totals = getPlanTrackTotals(monthRecords);
+  const monthRecords = useMemo(
+    () => getRecordsForMonth(records, currentDate),
+    [currentDate, records],
+  );
+  const totals = useMemo(
+    () => getPlanTrackTotals(monthRecords),
+    [monthRecords],
+  );
 
   return (
     <Box

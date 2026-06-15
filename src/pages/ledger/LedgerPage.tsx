@@ -3,6 +3,8 @@ import {
   LedgerNetSection,
   LedgerPivotSection,
 } from "../../features/finance/components/LedgerSections";
+import { LedgerSummary } from "../../features/finance/components/LedgerSummary";
+import { NewRecordButton } from "../../features/finance/components/NewRecordButton";
 import { PageHeader } from "../../shared/components/layout/PageHeader";
 import { EmptyState } from "../../shared/components/ui/EmptyState";
 import { LedgerHeaderControls } from "./_components/LedgerHeaderControls";
@@ -32,9 +34,11 @@ export const LedgerPage = () => {
           <EmptyState
             title={page.emptyTitle}
             description={page.emptyDescription}
+            action={<NewRecordButton label="Add record" />}
           />
         ) : (
           <>
+            <LedgerSummary records={page.yearRecords} mode={page.mode} />
             <LedgerPivotSection
               title="Income"
               type="income"

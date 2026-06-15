@@ -26,7 +26,12 @@ export const TrendCharts = ({ data }: TrendChartsProps) => (
       title="Net worth flow"
       subtitle="Tracked vs planned net per month"
     >
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer
+        width="100%"
+        height="100%"
+        minWidth={1}
+        minHeight={1}
+      >
         <AreaChart data={data}>
           <defs>
             <linearGradient id="netTracked" x1="0" y1="0" x2="0" y2="1">
@@ -122,14 +127,16 @@ const ChartCard = ({
   subtitle: string;
   children: ReactNode;
 }) => (
-  <Card variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
+  <Card variant="outlined" sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3 }}>
     <Typography variant="h6" fontWeight={700}>
       {title}
     </Typography>
     <Typography variant="caption" color="text.secondary">
       {subtitle}
     </Typography>
-    <Box sx={{ height: 300, mt: 2 }}>{children}</Box>
+    <Box sx={{ height: { xs: 260, sm: 300 }, minWidth: 0, mt: 2 }}>
+      {children}
+    </Box>
   </Card>
 );
 
@@ -149,7 +156,7 @@ const TrendLine = ({
   data: TrendPoint[];
 }) => (
   <ChartCard title={title} subtitle="Tracked vs planned">
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
       <LineChart data={data}>
         <CartesianGrid
           strokeDasharray="3 3"

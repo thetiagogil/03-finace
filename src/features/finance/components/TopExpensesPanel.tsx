@@ -7,6 +7,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { getCategoryTotals, getRecordsForMonth } from "../lib/calculations";
 import { FINANCE_COLORS } from "../lib/colors";
@@ -23,14 +24,26 @@ export const TopExpensesPanel = ({
   records,
   currentDate,
 }: TopExpensesPanelProps) => {
-  const monthRecords = getRecordsForMonth(records, currentDate);
-  const topExpenses = getCategoryTotals(
-    monthRecords.filter((record) => record.type === "expense"),
-  ).slice(0, 5);
+  const monthRecords = useMemo(
+    () => getRecordsForMonth(records, currentDate),
+    [currentDate, records],
+  );
+  const topExpenses = useMemo(
+    () =>
+      getCategoryTotals(
+        monthRecords.filter((record) => record.type === "expense"),
+      ).slice(0, 5),
+    [monthRecords],
+  );
 
   return (
-    <Card variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
-      <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
+    <Card variant="outlined" sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3 }}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        spacing={1}
+        sx={{ mb: 3 }}
+      >
         <Box>
           <Typography variant="h6" fontWeight={700}>
             Top expenses

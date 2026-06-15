@@ -28,6 +28,9 @@ const write = (key: string, value: unknown) => {
   emit();
 };
 
+const categoryEquals = (left: string, right: string) =>
+  left.trim().toLowerCase() === right.trim().toLowerCase();
+
 const readRecords = (key: string) => {
   const storedRecords = readStorage<unknown>(key, []);
   if (!Array.isArray(storedRecords)) return [];
@@ -133,7 +136,80 @@ export const getCategories = (type: RecordType) => {
 };
 
 export const addCategory = (type: RecordType, name: string) => {
+  const trimmedName = name.trim();
+  if (!trimmedName) return;
+  if (getCategories(type).some((category) => categoryEquals(category, name))) {
+    return;
+  }
+
   const custom = readCustomCategories();
-  custom[type] = Array.from(new Set([...(custom[type] ?? []), name]));
+  custom[type] = [...(custom[type] ?? []), trimmedName];
   write(activeCategoriesKey(), custom);
+};
+
+export const renameCategory = (
+  type: RecordType,
+  currentName: string,
+  nextName: string,
+) => {
+  const custom = readCustomCategories();
+  if (
+    DEFAULT_CATEGORIES[type].some((category) =>
+      categoryEquals(category, currentName),
+    )
+  ) {
+    return false;
+  }
+
+  const customCategories = custom[type] ?? [];
+  if (
+    !customCategories.some((category) => categoryEquals(category, currentName))
+  ) {
+    return false;
+  }
+
+  if (
+    getCategories(type).some(
+      (category) =>
+        categoryEquals(category, nextName) &&
+        !categoryEquals(category, currentName),
+    )
+  ) {
+    return false;
+  }
+
+  custom[type] = customCategories.map((category) =>
+    categoryEquals(category, currentName) ? nextName : category,
+  );
+
+  const records = getRecords().map((record) =>
+    record.type === type && categoryEquals(record.category, currentName)
+      ? { ...record, category: nextName }
+      : record,
+  );
+
+  writeStorage(activeCategoriesKey(), custom);
+  writeStorage(activeRecordsKey(), records);
+  emit();
+  return true;
+};
+
+export const removeCategory = (type: RecordType, name: string) => {
+  const custom = readCustomCategories();
+  if (
+    DEFAULT_CATEGORIES[type].some((category) => categoryEquals(category, name))
+  ) {
+    return false;
+  }
+
+  const customCategories = custom[type] ?? [];
+  if (!customCategories.some((category) => categoryEquals(category, name))) {
+    return false;
+  }
+
+  custom[type] = customCategories.filter(
+    (category) => !categoryEquals(category, name),
+  );
+  write(activeCategoriesKey(), custom);
+  return true;
 };

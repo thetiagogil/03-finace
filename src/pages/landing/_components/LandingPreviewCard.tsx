@@ -1,5 +1,6 @@
 import { Box, Card, LinearProgress, Stack, Typography } from "@mui/material";
 import { FINANCE_COLORS } from "../../../features/finance/lib/colors";
+import { formatCurrency } from "../../../features/finance/lib/formatters";
 import { PreviewMetricTile } from "./PreviewMetricTile";
 
 const previewExpenses = [
@@ -22,16 +23,16 @@ export const LandingPreviewCard = () => (
         April 2026
       </Typography>
     </Stack>
-    <Stack direction="row" spacing={1.5}>
+    <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
       <PreviewMetricTile
         label="Tracked"
-        value="€3,580"
+        value={formatCurrency(3580)}
         color={FINANCE_COLORS.trackedIncome}
         delta="+12% vs plan"
       />
       <PreviewMetricTile
         label="Planned"
-        value="€3,200"
+        value={formatCurrency(3200)}
         color={FINANCE_COLORS.plannedIncome}
       />
     </Stack>
@@ -49,7 +50,7 @@ export const LandingPreviewCard = () => (
                 {item.label}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                €{item.tracked} / €{item.planned}
+                {formatCurrency(item.tracked)} / {formatCurrency(item.planned)}
               </Typography>
             </Stack>
             <LinearProgress
