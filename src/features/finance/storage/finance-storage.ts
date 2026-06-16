@@ -24,8 +24,13 @@ const activeCategoriesKey = () =>
   STORAGE_KEYS.categoriesForUser(getActiveUserId());
 
 const write = (key: string, value: unknown) => {
-  writeStorage(key, value);
-  emit();
+  const didWrite = writeStorage(key, value);
+
+  if (didWrite) {
+    emit();
+  }
+
+  return didWrite;
 };
 
 const categoryEquals = (left: string, right: string) =>
@@ -40,22 +45,22 @@ const readRecords = (key: string) => {
     .filter((record): record is FinanceRecord => Boolean(record));
 };
 
+const normalizeCategories = (value: unknown) =>
+  Array.isArray(value)
+    ? value
+        .filter((category): category is string => typeof category === "string")
+        .map((category) => category.trim())
+        .filter(Boolean)
+    : [];
+
 const readCustomCategories = () => {
   const storedCategories = readStorage<unknown>(activeCategoriesKey(), {});
   if (!storedCategories || typeof storedCategories !== "object") return {};
 
   const categories = storedCategories as Partial<Record<RecordType, unknown>>;
   return {
-    income: Array.isArray(categories.income)
-      ? categories.income.filter(
-          (category): category is string => typeof category === "string",
-        )
-      : [],
-    expense: Array.isArray(categories.expense)
-      ? categories.expense.filter(
-          (category): category is string => typeof category === "string",
-        )
-      : [],
+    income: normalizeCategories(categories.income),
+    expense: normalizeCategories(categories.expense),
   } satisfies Record<RecordType, string[]>;
 };
 
@@ -74,7 +79,14 @@ export const subscribeToFinanceStorage = (listener: Listener) => {
 
 export const getRecordsSnapshot = () => {
   const key = activeRecordsKey();
-  const json = localStorage.getItem(key) ?? "[]";
+  let json: string;
+
+  try {
+    json = localStorage.getItem(key) ?? "[]";
+  } catch {
+    return emptyRecords;
+  }
+
   const cacheKey = `${key}:${json}`;
   const cached = cache.get(cacheKey);
   if (cached) return cached;
@@ -94,7 +106,7 @@ export const replaceRecordsForUser = (
   userId: string,
   records: FinanceRecord[],
 ) => {
-  write(STORAGE_KEYS.recordsForUser(userId), records);
+  return write(STORAGE_KEYS.recordsForUser(userId), records);
 };
 
 export const getRecords = () => readRecords(activeRecordsKey());
@@ -105,11 +117,11 @@ export const addRecord = (record: FinanceRecordInput) => {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
   };
-  write(activeRecordsKey(), [nextRecord, ...getRecords()]);
+  return write(activeRecordsKey(), [nextRecord, ...getRecords()]);
 };
 
 export const updateRecord = (id: string, patch: Partial<FinanceRecord>) => {
-  write(
+  return write(
     activeRecordsKey(),
     getRecords().map((record) =>
       record.id === id ? { ...record, ...patch } : record,
@@ -118,14 +130,14 @@ export const updateRecord = (id: string, patch: Partial<FinanceRecord>) => {
 };
 
 export const deleteRecord = (id: string) => {
-  write(
+  return write(
     activeRecordsKey(),
     getRecords().filter((record) => record.id !== id),
   );
 };
 
 export const clearAllRecords = () => {
-  write(activeRecordsKey(), []);
+  return write(activeRecordsKey(), []);
 };
 
 export const getCategories = (type: RecordType) => {
@@ -137,14 +149,14 @@ export const getCategories = (type: RecordType) => {
 
 export const addCategory = (type: RecordType, name: string) => {
   const trimmedName = name.trim();
-  if (!trimmedName) return;
+  if (!trimmedName) return false;
   if (getCategories(type).some((category) => categoryEquals(category, name))) {
-    return;
+    return false;
   }
 
   const custom = readCustomCategories();
   custom[type] = [...(custom[type] ?? []), trimmedName];
-  write(activeCategoriesKey(), custom);
+  return write(activeCategoriesKey(), custom);
 };
 
 export const renameCategory = (
@@ -152,6 +164,9 @@ export const renameCategory = (
   currentName: string,
   nextName: string,
 ) => {
+  const trimmedNextName = nextName.trim();
+  if (!trimmedNextName) return false;
+
   const custom = readCustomCategories();
   if (
     DEFAULT_CATEGORIES[type].some((category) =>
@@ -171,7 +186,7 @@ export const renameCategory = (
   if (
     getCategories(type).some(
       (category) =>
-        categoryEquals(category, nextName) &&
+        categoryEquals(category, trimmedNextName) &&
         !categoryEquals(category, currentName),
     )
   ) {
@@ -179,17 +194,28 @@ export const renameCategory = (
   }
 
   custom[type] = customCategories.map((category) =>
-    categoryEquals(category, currentName) ? nextName : category,
+    categoryEquals(category, currentName) ? trimmedNextName : category,
   );
 
   const records = getRecords().map((record) =>
     record.type === type && categoryEquals(record.category, currentName)
-      ? { ...record, category: nextName }
+      ? { ...record, category: trimmedNextName }
       : record,
   );
 
-  writeStorage(activeCategoriesKey(), custom);
-  writeStorage(activeRecordsKey(), records);
+  const categoriesKey = activeCategoriesKey();
+  const recordsKey = activeRecordsKey();
+  const previousCategories = readStorage<unknown>(categoriesKey, {});
+
+  if (!writeStorage(categoriesKey, custom)) {
+    return false;
+  }
+
+  if (!writeStorage(recordsKey, records)) {
+    writeStorage(categoriesKey, previousCategories);
+    return false;
+  }
+
   emit();
   return true;
 };
@@ -210,6 +236,5 @@ export const removeCategory = (type: RecordType, name: string) => {
   custom[type] = customCategories.filter(
     (category) => !categoryEquals(category, name),
   );
-  write(activeCategoriesKey(), custom);
-  return true;
+  return write(activeCategoriesKey(), custom);
 };

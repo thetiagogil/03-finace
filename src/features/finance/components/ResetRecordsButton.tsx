@@ -9,6 +9,7 @@ export const ResetRecordsButton = () => (
     description="This removes every local record for the current user. Categories stay available, but the records cannot be restored."
     confirmLabel="Reset data"
     onConfirm={clearAllRecords}
+    errorMessage="Records could not be reset. Check browser storage and try again."
   >
     <Button variant="outlined" color="error" startIcon={<DeleteOutlineIcon />}>
       Reset all data

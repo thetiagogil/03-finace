@@ -5,11 +5,11 @@ import { useTestUserSession } from "./useTestUserSession";
 
 export const useLoginForm = () => {
   const navigate = useNavigate();
-  const handleTestUser = useTestUserSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const handleTestUser = useTestUserSession(setError);
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();

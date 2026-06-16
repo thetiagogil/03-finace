@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type { FinanceRecord, RecordMode, RecordType } from "../types";
+import { isRecordAmount, isRecordDate } from "../lib/validation";
 import {
   addRecord,
   getCategories,
@@ -14,12 +15,6 @@ interface UseRecordDialogInput {
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-const isValidDate = (value: string) => {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-  const parsed = new Date(`${value}T00:00:00`);
-  return !Number.isNaN(parsed.getTime());
-};
-
 export const useRecordDialog = ({
   defaultType,
   defaultMode,
@@ -33,11 +28,12 @@ export const useRecordDialog = ({
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(today());
   const [description, setDescription] = useState("");
+  const [saveError, setSaveError] = useState("");
 
   const categories = useMemo(() => getCategories(type), [type]);
   const numericAmount = Number(amount);
-  const amountIsValid = Number.isFinite(numericAmount) && numericAmount > 0;
-  const dateIsValid = isValidDate(date);
+  const amountIsValid = isRecordAmount(numericAmount);
+  const dateIsValid = isRecordDate(date);
   const categoryIsValid = categories.includes(category);
   const isValid = amountIsValid && dateIsValid && categoryIsValid;
 
@@ -66,6 +62,7 @@ export const useRecordDialog = ({
       setDate(today());
       setDescription("");
     }
+    setSaveError("");
     setOpen(true);
   };
 
@@ -82,10 +79,15 @@ export const useRecordDialog = ({
       description: description || undefined,
     };
 
-    if (initialRecord) {
-      updateRecord(initialRecord.id, payload);
-    } else {
-      addRecord(payload);
+    const didSave = initialRecord
+      ? updateRecord(initialRecord.id, payload)
+      : addRecord(payload);
+
+    if (!didSave) {
+      setSaveError(
+        "Record could not be saved. Check browser storage and try again.",
+      );
+      return;
     }
 
     setOpen(false);
@@ -101,6 +103,7 @@ export const useRecordDialog = ({
     date,
     description,
     categories,
+    saveError,
     isValid,
     amountIsValid,
     dateIsValid,
@@ -117,3 +120,5 @@ export const useRecordDialog = ({
     handleSubmit,
   };
 };
+
+export type RecordDialogController = ReturnType<typeof useRecordDialog>;

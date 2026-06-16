@@ -8,9 +8,19 @@ export const readStorage = <T>(key: string, fallback: T): T => {
 };
 
 export const writeStorage = (key: string, value: unknown) => {
-  localStorage.setItem(key, JSON.stringify(value));
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 export const removeStorage = (key: string) => {
-  localStorage.removeItem(key);
+  try {
+    localStorage.removeItem(key);
+    return true;
+  } catch {
+    return false;
+  }
 };

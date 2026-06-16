@@ -101,5 +101,7 @@ export const seedTestUserRecords = () => {
       makeSeedRecord("expense", "tracked", "Subscriptions", 72, 3, monthOffset),
     );
   }
-  replaceRecordsForUser(TEST_USER.id, records);
+  if (!replaceRecordsForUser(TEST_USER.id, records)) {
+    throw new Error("Demo records could not be saved. Check browser storage.");
+  }
 };

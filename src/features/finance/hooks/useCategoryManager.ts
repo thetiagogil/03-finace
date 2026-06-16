@@ -48,7 +48,16 @@ export const useCategoryManager = (records: FinanceRecord[]) => {
       return;
     }
 
-    addCategory(type, trimmedName);
+    const added = addCategory(type, trimmedName);
+
+    if (!added) {
+      setFeedback({
+        type: "error",
+        message: `${trimmedName} could not be saved. Check browser storage and try again.`,
+      });
+      return;
+    }
+
     setCategories(getCategories(type));
     setFeedback({
       type: "success",

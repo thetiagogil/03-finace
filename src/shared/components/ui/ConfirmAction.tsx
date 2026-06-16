@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -24,8 +25,9 @@ interface ConfirmActionProps {
   title: string;
   description: string;
   confirmLabel: string;
-  onConfirm: () => void;
+  onConfirm: () => boolean | void;
   children: ReactElement<ConfirmActionTriggerProps>;
+  errorMessage?: string;
   tooltip?: string;
 }
 
@@ -35,17 +37,32 @@ export const ConfirmAction = ({
   confirmLabel,
   onConfirm,
   children,
+  errorMessage = "This action could not be completed. Check browser storage and try again.",
   tooltip,
 }: ConfirmActionProps) => {
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState("");
 
   const handleConfirm = () => {
-    onConfirm();
+    try {
+      const result = onConfirm();
+
+      if (result === false) {
+        setError(errorMessage);
+        return;
+      }
+    } catch {
+      setError(errorMessage);
+      return;
+    }
+
+    setError("");
     setOpen(false);
   };
 
   const handleTriggerClick = (event: MouseEvent<HTMLElement>) => {
     children.props.onClick?.(event);
+    setError("");
     setOpen(true);
   };
 
@@ -61,6 +78,11 @@ export const ConfirmAction = ({
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
           <DialogContentText>{description}</DialogContentText>
+          {error && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {error}
+            </Alert>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>

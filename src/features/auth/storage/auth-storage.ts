@@ -15,8 +15,13 @@ const listeners = new Set<Listener>();
 const emit = () => listeners.forEach((listener) => listener());
 
 const write = (key: string, value: unknown) => {
-  writeStorage(key, value);
-  emit();
+  const didWrite = writeStorage(key, value);
+
+  if (didWrite) {
+    emit();
+  }
+
+  return didWrite;
 };
 
 const hash = (value: string) => {
@@ -71,7 +76,10 @@ const ensureTestUser = () => {
     passwordHash: hash(TEST_USER.password),
     isTestUser: TEST_USER.isTestUser,
   };
-  write(STORAGE_KEYS.users, [...users, user]);
+  if (!write(STORAGE_KEYS.users, [...users, user])) {
+    throw new Error("Demo account could not be saved. Check browser storage.");
+  }
+
   return user;
 };
 
@@ -103,8 +111,14 @@ export const signup = (input: {
     email,
     passwordHash: hash(input.password),
   };
-  write(STORAGE_KEYS.users, [...users, user]);
-  write(STORAGE_KEYS.session, user.id);
+  if (!write(STORAGE_KEYS.users, [...users, user])) {
+    throw new Error("Account could not be saved. Check browser storage.");
+  }
+
+  if (!write(STORAGE_KEYS.session, user.id)) {
+    throw new Error("Session could not be saved. Try logging in again.");
+  }
+
   return getPublicUser(user);
 };
 
@@ -113,19 +127,26 @@ export const login = (input: { email: string; password: string }) => {
   const user = getUsers().find((item) => item.email === email);
   if (!user || user.passwordHash !== hash(input.password))
     throw new Error("Invalid email or password");
-  write(STORAGE_KEYS.session, user.id);
+  if (!write(STORAGE_KEYS.session, user.id)) {
+    throw new Error("Session could not be saved. Check browser storage.");
+  }
+
   return getPublicUser(user);
 };
 
 export const continueWithTestUser = () => {
   const user = ensureTestUser();
-  write(STORAGE_KEYS.session, user.id);
+  if (!write(STORAGE_KEYS.session, user.id)) {
+    throw new Error("Demo session could not be saved. Check browser storage.");
+  }
+
   return getPublicUser(user);
 };
 
 export const logout = () => {
-  removeStorage(STORAGE_KEYS.session);
-  emit();
+  if (removeStorage(STORAGE_KEYS.session)) {
+    emit();
+  }
 };
 
 export const subscribeToAuthStorage = (listener: Listener) => {
@@ -139,7 +160,11 @@ export const subscribeToAuthStorage = (listener: Listener) => {
 };
 
 export const getSessionSnapshot = () => {
-  return localStorage.getItem(STORAGE_KEYS.session) ?? "";
+  try {
+    return localStorage.getItem(STORAGE_KEYS.session) ?? "";
+  } catch {
+    return "";
+  }
 };
 
 export const getEmptySessionSnapshot = () => {

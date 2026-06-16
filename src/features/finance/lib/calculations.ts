@@ -269,7 +269,11 @@ export const getNetMonthTotals = (records: FinanceRecord[]) => {
   const totals = emptyMonthTotals();
   records.forEach((record) => {
     const monthIndex = Number(record.date.slice(5, 7)) - 1;
-    totals[monthIndex][record.mode] +=
+    const cell = totals[monthIndex];
+
+    if (!cell) return;
+
+    cell[record.mode] +=
       record.type === "income" ? record.amount : -record.amount;
   });
   return totals;

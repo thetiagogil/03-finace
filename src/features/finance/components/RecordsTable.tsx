@@ -140,6 +140,7 @@ export const RecordsTable = ({
                     description="This record will be permanently removed from your local data."
                     confirmLabel="Delete"
                     onConfirm={() => deleteRecord(record.id)}
+                    errorMessage="Record could not be deleted. Check browser storage and try again."
                     tooltip="Delete record"
                   >
                     <IconButton
