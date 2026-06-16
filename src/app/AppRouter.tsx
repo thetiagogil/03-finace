@@ -9,15 +9,18 @@ import {
   PublicOnlyRoute,
 } from "../features/auth/components/RouteGuard";
 import { PageShell } from "../shared/components/layout/PageShell";
-import { LoginPage } from "../pages/auth/LoginPage";
-import { SignupPage } from "../pages/auth/SignupPage";
-import { CategoriesPage } from "../pages/categories/CategoriesPage";
-import { ComparePage } from "../pages/compare/ComparePage";
-import { DashboardPage } from "../pages/dashboard/DashboardPage";
-import { LandingPage } from "../pages/landing/LandingPage";
-import { LedgerPage } from "../pages/ledger/LedgerPage";
-import { RecordsPage } from "../pages/records/RecordsPage";
-import { TrendsPage } from "../pages/trends/TrendsPage";
+import {
+  CategoriesPage,
+  ComparePage,
+  DashboardPage,
+  LandingPage,
+  LedgerPage,
+  LoginPage,
+  RecordsPage,
+  SignupPage,
+  TrendsPage,
+} from "./lazy-pages";
+import { RouteSuspense } from "./RouteSuspense";
 import { ScrollToTop } from "./ScrollToTop";
 
 export const AppRouter = () => {
@@ -25,74 +28,24 @@ export const AppRouter = () => {
     <Router>
       <ScrollToTop />
       <PageShell>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route
-            path="/login"
-            element={
-              <PublicOnlyRoute>
-                <LoginPage />
-              </PublicOnlyRoute>
-            }
-          />
-          <Route
-            path="/signup"
-            element={
-              <PublicOnlyRoute>
-                <SignupPage />
-              </PublicOnlyRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/records"
-            element={
-              <ProtectedRoute>
-                <RecordsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/ledger"
-            element={
-              <ProtectedRoute>
-                <LedgerPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/compare"
-            element={
-              <ProtectedRoute>
-                <ComparePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/trends"
-            element={
-              <ProtectedRoute>
-                <TrendsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/categories"
-            element={
-              <ProtectedRoute>
-                <CategoriesPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <RouteSuspense>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route element={<PublicOnlyRoute />}>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+            </Route>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/records" element={<RecordsPage />} />
+              <Route path="/ledger" element={<LedgerPage />} />
+              <Route path="/compare" element={<ComparePage />} />
+              <Route path="/trends" element={<TrendsPage />} />
+              <Route path="/categories" element={<CategoriesPage />} />
+            </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </RouteSuspense>
       </PageShell>
     </Router>
   );
